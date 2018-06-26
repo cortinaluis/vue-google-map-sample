@@ -4,11 +4,11 @@ vue-cli + Google Map + d3 (as an verlay sample)
 
 ## 1. Description
 
-### 1-1. vue-cli
+### 1-1. What I did
 
-First, using "vue-cli" v3.0 to create a skeltal project.  
-Second, setup Google Map using "google-maps-api-loader".  
-Finally, using "d3" v5 to plot an overlay layer as SVG.
+(1) Using "vue-cli" v3.0 to create a skeltal project.  
+(2) Setup Google Map using "google-maps-api-loader".  
+(3) Using "d3" v5 to plot an overlay layer as SVG.
 
 ### 1-2. About Google Overlay + d3 SVG features
 
@@ -35,9 +35,9 @@ npm install --save-dev json-loader
 npm install --save-dev html-loader
 ```
 
-### 2-2. Files Handling
+### 2-2. Importing Files
 
-#### (a) *.geojson
+#### *.geojson
 
 To utilize any `*.geojson` file at build time, we need `json-loader`.  
 Also, needs the following in `vue.config.js`.  
@@ -58,7 +58,7 @@ module.exports = {
 };
 ```
 
-#### (b) *.html
+#### *.html
 
 Since I use separate "html" and "css" files instead of using `*.vue` files  
 for Vue components, I need `html-loader`.
@@ -88,7 +88,7 @@ module.exports = {
 };
 ```
 
-#### (c) *.styl
+#### *.styl
 
 Importing `*.styl` should work just fine without any changes on your build settings.
 
