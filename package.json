@@ -1,7 +1,7 @@
 {
   "name": "vue-google-map-sample",
-  "version": "0.1.1",
-  "private": true,
+  "version": "0.1.2",
+  "description": "vue-cli + Google Map + d3 (as an verlay sample)",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",

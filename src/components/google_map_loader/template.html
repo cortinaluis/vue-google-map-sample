@@ -2,11 +2,9 @@
     <div id="map"></div>
     <template v-if="!!this.google && !!this.map">
         <!--
-             Provides "google" and "map" to <template />
-             defined in "views/MyGoogleMap.vue" in which
-             both scope variables are again passed
-             down to "components/Spot.vue".
-             (needed for "Spot.vue" to place each marker)
+             Provides "google" and "map" to <template /> defined in "views/map"
+             in which both scope properties are passed down to "components/spot".
+             ("components/spot" needs them for mapping jobs)
         -->
         <slot :google="google" :map="map" />
     </template>

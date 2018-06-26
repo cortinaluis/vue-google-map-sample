@@ -2,12 +2,12 @@
 import template from './template.html';
 
 export default {
-  name: 'Spot',
+  name: 'spot',
   template,
   props: {
-    google: Object, // Provided by "components/GoogleMapLoader.vue".
-    map: Object, // Provided by "components/GoogleMapLoader.vue".
-    spot: Object, // Given directly from "views/MyGoogleMap.vue".
+    google: Object, // Provided by "components/google_map_loader".
+    map: Object, // Provided by "components/google_map_loader".
+    spot: Object, // Given directly from "views/map".
   },
   data() {
     return { marker: null };

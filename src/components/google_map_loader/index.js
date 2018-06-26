@@ -5,7 +5,7 @@ import template from './template.html';
 import './style.styl';
 
 export default {
-  name: 'GoogleMapLoader',
+  name: 'google-map-loader',
   template,
   props: {
     config: Object,
@@ -13,6 +13,8 @@ export default {
   },
   data() {
     return {
+      // These 2 will be passed down to "view/map" and then
+      // to "component/spot" as slot properties.
       google: null,
       map: null,
     };

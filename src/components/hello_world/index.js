@@ -2,7 +2,7 @@ import template from './template.html';
 import './style.styl';
 
 export default {
-  name: 'HelloWorld',
+  name: 'hello-world',
   template,
   props: {
     msg: String,

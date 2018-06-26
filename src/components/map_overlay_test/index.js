@@ -7,7 +7,11 @@ const DEFAULT_PADDING_SIZE = 5000;
 const DEFAULT_FILL_COLOR = '#ff0000';
 const DEFAULT_OPACITY = 0.65;
 
-const features = [ // '../../assets/json/locations.geojson'
+// http://global.mapit.mysociety.org/area/973041.html
+// import central from '../../assets/json/singapore_central_973041.geojson';
+
+// Embedded GEOJSON for a simple test.
+const features = [
     {
       type: 'Feature',
       id: 0,
@@ -16,9 +20,9 @@ const features = [ // '../../assets/json/locations.geojson'
         type: 'Polygon',
         coordinates: [
           [
-            [103.8534648, 1.3008724],
-            [103.8522904, 1.2948883],
-            [103.8567434, 1.3006284],
+            [103.8534648, 1.3008724], // Bugis MRT
+            [103.8522904, 1.2948883], // Raffles Hotel
+            [103.8567434, 1.3006284], // Blu Jaz Cafe
             [103.8534648, 1.3008724]
           ]
         ]
@@ -26,6 +30,9 @@ const features = [ // '../../assets/json/locations.geojson'
     }
 ];
 
+/**
+ * @returns {Function}
+ */
 const projectorFactory = (google, projection, options = {}) => {
   const { padding = 0 } = options;
   const point = function pointStream(lng, lat) {
@@ -37,6 +44,9 @@ const projectorFactory = (google, projection, options = {}) => {
   return d3.geoTransform({ point });
 };
 
+/**
+ * @returns {Function}
+ */
 const drawFactory = google => function draw() {
   const projection = this.getProjection();
   const projector = projectorFactory(google, projection, { padding: DEFAULT_PADDING_SIZE });
@@ -67,24 +77,20 @@ const drawFactory = google => function draw() {
 };
 
 export default {
-  name: 'MapOverlayTest',
+  name: 'map-overlay-test',
   template,
   props: {
-    google: Object, // Provided by "components/GoogleMapLoader.vue".
-    map: Object, // Provided by "components/GoogleMapLoader.vue".
+    google: Object, // Provided by "components/google_map_loader".
+    map: Object, // Provided by "components/google_map_loader".
   },
   mounted() {
-    try {
-      const self = this;
-      const overlay = new this.google.maps.OverlayView();
-      overlay.setMap(this.map);
-      overlay.onAdd = function onAdd() {
-        d3.select(this.getPanes().overlayLayer).append('div').attr('class', 'mLayer');
-        this.draw = drawFactory(self.google);
-      };
-    } catch (err) {
-      console.error(err);
-    }
+    const self = this;
+    const overlay = new this.google.maps.OverlayView();
+    overlay.setMap(this.map);
+    overlay.onAdd = function onAdd() {
+      d3.select(this.getPanes().overlayLayer).append('div').attr('class', 'mLayer');
+      this.draw = drawFactory(self.google);
+    };
   },
 };
 
