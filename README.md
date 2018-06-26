@@ -1,16 +1,16 @@
 # vue-google-map-sample
 
-vue-cli + Google Map + d3 (as an verlay sample)
+vue-cli + Google Map + d3 (for SVG overlay example)
 
-## 1. Description
+## 1. Overview
 
-### 1-1. What I did
+### What I did
 
-(1) Using "vue-cli" v3.0 to create a skeltal project.  
-(2) Setup Google Map using "google-maps-api-loader".  
-(3) Using "d3" v5 to plot an overlay layer as SVG.
+1. Using "vue-cli" v3.0 to create a skeltal project.
+2. Setup Google Map using "google-maps-api-loader".
+3. Using "d3" v5 to plot an overlay layer as SVG.
 
-### 1-2. About Google Overlay + d3 SVG features
+### About Google Overlay + d3 SVG features
 
 For a given coordinates defined in a `geojson` file,
 projects them as SVG using d3 v5 on a Google Overlay layer.  
@@ -24,7 +24,7 @@ Blu Jaz Cafe: 103.8567434, 1.3006284
 
 ## 2. Notes
 
-### 2-1. Installed Node Modules
+### Installed Node Modules
 
 ```
 npm install --save google-maps-api-loader
@@ -35,7 +35,7 @@ npm install --save-dev json-loader
 npm install --save-dev html-loader
 ```
 
-### 2-2. Importing Files
+### Importing Files
 
 #### *.geojson
 
