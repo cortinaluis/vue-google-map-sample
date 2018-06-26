@@ -1,0 +1,16 @@
+<div class="my-google-map">
+    <google-map-loader :api-key="apiKey" :config="config">
+        <!--
+             This template bellow will be deployed to <slot />
+             defined in "components/GoogleMapLoader.vue".
+             Notice how "components/GoogleMapLoader.vue"
+             provides you newly created "google" and "map" in return.
+             Also, notice we are directly passing "spot"
+             to "components/Spot.vue".
+        -->
+        <template slot-scope="{ google, map }">
+            <spot v-for="(spot,i) in spots" :key="i" :google="google" :map="map" :spot="spot" />
+            <map-overlay-test :google="google" :map="map" />
+        </template>
+    </google-map-loader>
+</div>

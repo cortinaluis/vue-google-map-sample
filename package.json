@@ -1,6 +1,6 @@
 {
   "name": "vue-google-map-sample",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -8,8 +8,21 @@
     "lint": "vue-cli-service lint",
     "test:unit": "vue-cli-service test:unit"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/minagawah/vue-google-map-sample.git"
+  },
+  "keywords": [
+    "vue",
+    "google map",
+    "d3"
+  ],
+  "author": "minagawah <minagawa@tokyo800.jp>",
+  "license": "mixed",
   "dependencies": {
+    "d3": "^5.4.0",
     "google-maps-api-loader": "^1.1.1",
+    "ramda": "^0.25.0",
     "register-service-worker": "^1.0.0",
     "vue": "^2.5.16",
     "vue-router": "^3.0.1",
@@ -25,6 +38,8 @@
     "@vue/test-utils": "^1.0.0-beta.16",
     "babel-core": "7.0.0-bridge.0",
     "babel-jest": "^23.0.1",
+    "html-loader": "^0.5.5",
+    "json-loader": "^0.5.7",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.2",
     "vue-template-compiler": "^2.5.16"

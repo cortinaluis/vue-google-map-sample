@@ -1,8 +1,8 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import Home from './views/Home.vue';
-import About from './views/About.vue';
-import MyGoogleMap from './views/MyGoogleMap.vue';
+import home from './views/home';
+import about from './views/about';
+import MyGoogleMap from './views/map';
 
 Vue.use(Router);
 
@@ -11,12 +11,12 @@ export default new Router({
     {
       path: '/',
       name: 'home',
-      component: Home,
+      component: home,
     },
     {
       path: '/about',
       name: 'about',
-      component: About,
+      component: about,
     },
     {
       path: '/map',
