@@ -1,25 +1,12 @@
-<template>
-  <div class="google-map-loader">
-    <div id="map"></div>
-    <template v-if="!!this.google && !!this.map">
-      <!--
-          Provides "google" and "map" to <template />
-          defined in "views/MyGoogleMap.vue" in which
-          both scope variables are again passed
-          down to "components/Spot.vue".
-          (needed for "Spot.vue" to place each marker)
-        -->
-      <slot :google="google" :map="map" />
-    </template>
-  </div>
-</template>
-
-<script>
 /* eslint no-unused-vars: [1] */
 import GoogleMapsApiLoader from 'google-maps-api-loader';
 
+import template from './template.html';
+import './style.styl';
+
 export default {
   name: 'GoogleMapLoader',
+  template,
   props: {
     config: Object,
     apiKey: String,
@@ -46,10 +33,3 @@ export default {
     }
   },
 };
-</script>
-
-<style scoped lang="stylus">
-#map
-  height: 100vh
-  width: 100%
-</style>

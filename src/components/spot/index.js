@@ -1,12 +1,9 @@
-<template>
-  <div />
-</template>
-
-<script>
 /* eslint no-unused-vars: [1] */
+import template from './template.html';
 
 export default {
   name: 'Spot',
+  template,
   props: {
     google: Object, // Provided by "components/GoogleMapLoader.vue".
     map: Object, // Provided by "components/GoogleMapLoader.vue".
@@ -22,7 +19,3 @@ export default {
     this.marker = new Marker({ title, map: this.map, position });
   },
 };
-</script>
-
-<style scoped lang="stylus">
-</style>
