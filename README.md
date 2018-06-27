@@ -12,7 +12,7 @@ vue-cli + Google Map + d3 (for SVG overlay example)
 
 ### More on What I actually did
 
-Here is how the template defined in our `view/map` look like:
+Here is how the template for `view/map` look like:
 
 ```
 <div id="map">
@@ -28,9 +28,8 @@ Here is how the template defined in our `view/map` look like:
 </div>
 ```
 
-Notice, we have 2 templates for slots that are defined in *"google-map-loader"* component.  
-Within the *"google-map-loader"* component (which is `components/google_map_loader`),
-we have the corresponding slots:
+Notice, we have 2 templates for *slots* that are defined in `components/google_map_loader`.  
+Within `components/google_map_loader`, we have the corresponding slots:
 
 ```
 <div id="google-map-loader">
@@ -41,33 +40,33 @@ we have the corresponding slots:
 </div>
 ```
 
-The job for *"google-map-loader"* component is to render a Google Map.
+The job for `components/google_map_loader` is to simply render a Google Map.
 It is basically a wrapper for [google-maps-api-loader](https://github.com/laurencedorman/google-maps-api-loader).
-By making the wrapper a separate component,
+By having `components/google_map_loader` as a separate component,
 we can automatically wait for whenever the map is ready.  
-Whenever the map is ready, this wrapper component is ready to pass 2 objects,
-`google` and `map`, back to `view/map`
-using one of the amazing feature of Vue: *&lt;slot-scope="*"&gt;*
+Whenever it's ready, `components/google_map_loader`
+uses Vue's &lt;slot-scope="*"&gt; feature
+to pass 2 props, `google` and `map`, back to `view/map`
 
 ```
         <template slot="map-others" slot-scope="{ google, map }">
 ```
 
-So that `view/map` can now utilize these newly created objects themselves.  
-Looking at the template for `view/map` once again, we have the following lines:
+So that `view/map` can now utilize these newly created props themselves.  
+Again, looking at the template for `view/map`, we notice the following lines:
 
 ```
             <spot v-for="(spot,i) in spots" :key="i" :google="google" :map="map" :spot="spot" />
             <map-overlay-test :google="google" :map="map" />
 ```
 
-Meaning, `view/map` is again passing these objects, this time, to its other child components,
-namely, *"spot"* and *"map-overlay-test"*
-(that are `components/spot` and `components/map-overlay-test` accordingly).
+Meaning, `view/map` is now passing these props, this time, to other child components:
+`components/spot` and `components/map-overlay-test`
 
-For the former iterates an array, called `spots`,
-each of which contains certain geographical coordinates,
-and is rendered as a marker within `components/spot`.
+For the former, iterates an array, called`spots`,
+each of which contains geo-coordinates for a certain spot,
+and is rendered into a marker on the map
+according to the rules defined in `components/spot`.
 
 For the later, when `google` and `map` is given,
 adds a new Google Overlay View to the map,
