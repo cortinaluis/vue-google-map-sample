@@ -6,11 +6,11 @@ vue-cli + Google Map + d3 (for SVG overlay example)
 
 ### What I did
 
-1. Using "vue-cli" v3.0 to create a skeltal project.
-2. Setup Google Map using "google-maps-api-loader".
-3. Using "d3" v5 to plot an overlay layer as SVG.
+1. Using [vue-cli (v3.0)](https://github.com/vuejs/vue-cli) to create a skeltal project.
+2. Setup Google Map using [google-maps-api-loader](https://github.com/laurencedorman/google-maps-api-loader).
+3. Using [d3 (v5)](https://d3js.org/) to plot an overlay layer as SVG.
 
-### In Depth
+### More on What I actually did
 
 Here is how `view/map/template.html` looks like:
 
@@ -27,7 +27,7 @@ Here is how `view/map/template.html` looks like:
 
 Because we want to wait for Google Map API to be ready,
 we use the component `component/google_map_loader`,
-which is basically a wrapper for "google-maps-api-loader"
+which is basically a wrapper for [google-maps-api-loader](https://github.com/laurencedorman/google-maps-api-loader)
 with its template providing a simple slot like this:
 
 ```
@@ -42,16 +42,16 @@ with its template providing a simple slot like this:
 Where its `<slot>` passing slot properties, namely "google" and "map",
 back to `view/map/template.html`.  
 As you can see, within `view/map/template.html`,
-it is utilizing the provided "google" and "map",
-this time, to 2 of the child components:
+it is utilizing the provided `google` and `map`,
+this time, to two of the following child components:
 
-1. **<spot>** (which is defined in `components/spot`)
-2. **<map-overlay-test>** (which is defined in `components/map_overlay_test`)
+1. **&lt;spot&gt;** (which is defined in `components/spot`)
+2. **&lt;map-overlay-test&gt;** (which is defined in `components/map_overlay_test`)
 
-For the former iterates an array "spots"
+For the former iterates an array, called `spots`,
 for each the location is rendered as a marker within `components/spot`.
 
-For the later, when "google" and "map" is given,
+For the later, when `google` and `map` is given,
 adds a new Google Overlay View to the map,
 and projects a SVG rendered overlay of certain places:
 
@@ -76,10 +76,10 @@ export default {
 ```
 
 
-### About Google Overlay + d3 SVG features
+### Sample Geo-Coordinates for d3 SVG Overlay
 
 For a given coordinates defined in a `geojson` file,
-projects them as SVG using d3 v5 on a Google Overlay layer.  
+projects them as SVG using [d3 v5](https://d3js.org/) on a Google Overlay layer.  
 Currently has three of the following spots (in Singapore) for the overlay.
 
 ```
