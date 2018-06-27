@@ -6,6 +6,7 @@ import MapOverlayTest from '@/components/map_overlay_test';
 import template from './template.html';
 import './style.styl';
 
+const MAP_ELEMENT_ID = 'my-google-map';
 const API_KEY = 'AIzaSyDtDdWEh0tzu4bbIic4Sa68iPOgYbkF3h8';
 const CENTER_SPOT = { name: 'Raffles Hotel', lat: 1.2953139, lng: 103.8524867 };
 const DEFAULT_ZOOM = 16;
@@ -22,7 +23,7 @@ export default {
   template,
   data() {
     return {
-      mapElemId: '#my-google-map',
+      mapElemId: MAP_ELEMENT_ID,
       apiKey: API_KEY,
       spots: SPOT_LIST,
       config: {
@@ -38,7 +39,7 @@ export default {
   },
   methods: {
     isReady() {
-      const el = this.$el.querySelector(this.mapElemId);
+      const el = this.$el.querySelector(`#${this.mapElemId}`);
       if (el) {
         const height = Math.trunc(window.innerHeight * 0.8);
         console.log(`Set the height for "${this.mapElemId}" being: ${height}px`);

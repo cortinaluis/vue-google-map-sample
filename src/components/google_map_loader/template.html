@@ -1,12 +1,12 @@
-<div class="google-map-loader">
+<div id="google-map-loader">
     <!-- "map" template is defined in "view/map" -->
-    <slot name="map"></slot>
+    <slot name="map-base"></slot>
     <template v-if="!!this.google && !!this.map">
         <!--
              Provides "google" and "map" to <template /> defined in "views/map"
              in which both scope properties are passed down to "components/spot".
              ("components/spot" needs them for mapping jobs)
         -->
-        <slot name="others" :google="google" :map="map" />
+        <slot name="map-others" :google="google" :map="map" />
     </template>
 </div>

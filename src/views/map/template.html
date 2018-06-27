@@ -1,8 +1,8 @@
 <div id="map">
     <google-map-loader :map-elem-id="mapElemId" :api-key="apiKey" :config="config" :isReady="isReady">
         <!-- "map" slot template will be deployed to <slot> in "components/google_map_loader". -->
-        <template slot="map">
-            <div id="my-google-map" />
+        <template slot="map-base">
+            <div v-bind:id="mapElemId" />
         </template>
         <!--
              "others" slot template will be deployed to <slot> in "components/google_map_loader".
@@ -10,7 +10,7 @@
              newly created "google" and "map" in return.
              Also, notice we are directly passing "spot" to "components/spot".
         -->
-        <template slot="others" slot-scope="{ google, map }">
+        <template slot="map-others" slot-scope="{ google, map }">
             <spot v-for="(spot,i) in spots" :key="i" :google="google" :map="map" :spot="spot" />
             <map-overlay-test :google="google" :map="map" />
         </template>

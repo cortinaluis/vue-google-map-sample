@@ -12,15 +12,15 @@ vue-cli + Google Map + d3 (for SVG overlay example)
 
 ### More on What I actually did
 
-Here is how `view/map/template.html` looks like:
+Here is how the template defined in our `view/map` look like:
 
 ```
 <div id="map">
     <google-map-loader :map-elem-id="mapElemId" :api-key="apiKey" :config="config" :isReady="isReady">
-        <template slot="map">
-            <div id="my-google-map" />
+        <template slot="map-base">
+            <div v-bind:id="mapElemId" />
         </template>
-        <template slot="others" slot-scope="{ google, map }">
+        <template slot="map-others" slot-scope="{ google, map }">
             <spot v-for="(spot,i) in spots" :key="i" :google="google" :map="map" :spot="spot" />
             <map-overlay-test :google="google" :map="map" />
         </template>
@@ -28,33 +28,46 @@ Here is how `view/map/template.html` looks like:
 </div>
 ```
 
-Please, forget about the first template &lt;template slot="map"&gt; for now.  
-For the second template &lt;template slot="others"&gt;,
-because we want to wait for Google Map API to be ready,
-we use the component `component/google_map_loader`,
-which is basically a wrapper for [google-maps-api-loader](https://github.com/laurencedorman/google-maps-api-loader)
-with its template providing some simple slots like this:
+Notice, we have 2 templates for slots that are defined in *"google-map-loader"* component.  
+Within the *"google-map-loader"* component (which is `components/google_map_loader`),
+we have the corresponding slots:
 
 ```
-<div class="google-map-loader">
-    <slot name="map"></slot>
+<div id="google-map-loader">
+    <slot name="map-base"></slot>
     <template v-if="!!this.google && !!this.map">
-        <slot name="others" :google="google" :map="map" />
+        <slot name="map-others" :google="google" :map="map" />
     </template>
 </div>
 ```
 
-Where the second &lt;slot name="others"&gt; is passing properties, namely `google` and `map`,
-back to `view/map/template.html`.  
-As you can see, within `view/map/template.html`,
-it is utilizing the provided `google` and `map`,
-this time, to two of the following child components:
+The job for *"google-map-loader"* component is to render a Google Map.
+It is basically a wrapper for [google-maps-api-loader](https://github.com/laurencedorman/google-maps-api-loader).
+By making the wrapper a separate component,
+we can automatically wait for whenever the map is ready.  
+Whenever the map is ready, this wrapper component is ready to pass 2 objects,
+`google` and `map`, back to `view/map`
+using one of the amazing feature of Vue: *&lt;slot-scope="*"&gt;*
 
-1. **&lt;spot&gt;** (which is defined in `components/spot`)
-2. **&lt;map-overlay-test&gt;** (which is defined in `components/map_overlay_test`)
+```
+        <template slot="map-others" slot-scope="{ google, map }">
+```
+
+So that `view/map` can now utilize these newly created objects themselves.  
+Looking at the template for `view/map` once again, we have the following lines:
+
+```
+            <spot v-for="(spot,i) in spots" :key="i" :google="google" :map="map" :spot="spot" />
+            <map-overlay-test :google="google" :map="map" />
+```
+
+Meaning, `view/map` is again passing these objects, this time, to its other child components,
+namely, *"spot"* and *"map-overlay-test"*
+(that are `components/spot` and `components/map-overlay-test` accordingly).
 
 For the former iterates an array, called `spots`,
-for each the location is rendered as a marker within `components/spot`.
+each of which contains certain geographical coordinates,
+and is rendered as a marker within `components/spot`.
 
 For the later, when `google` and `map` is given,
 adds a new Google Overlay View to the map,

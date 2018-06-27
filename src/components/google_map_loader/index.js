@@ -22,7 +22,7 @@ export default {
   },
   mounted() {
     const { mapElemId = '#map', apiKey, config = {} } = this;
-    const el = this.$el.querySelector(mapElemId);
+    const el = this.$el.querySelector(`#${mapElemId}`);
     if (!apiKey) throw new Error('No API_KEY.');
     if (!el) throw new Error('No container for the map.');
     GoogleMapsApiLoader({ apiKey }).then((google) => {
