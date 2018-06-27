@@ -15,9 +15,19 @@ vue-cli + Google Map + d3 (for SVG overlay example)
 Here is how `view/map/template.html` looks like:
 
 ```
-<div class="my-google-map">
-    <google-map-loader :api-key="apiKey" :config="config">
-        <template slot-scope="{ google, map }">
+<div id="map">
+    <google-map-loader :map-elem-id="mapElemId" :api-key="apiKey" :config="config" :isReady="isReady">
+        <!-- "map" slot template will be deployed to <slot> in "components/google_map_loader". -->
+        <template slot="map">
+            <div id="my-google-map" />
+        </template>
+        <!--
+             "others" slot template will be deployed to <slot> in "components/google_map_loader".
+             Notice how "components/google_map_loader" provides you
+             newly created "google" and "map" in return.
+             Also, notice we are directly passing "spot" to "components/spot".
+        -->
+        <template slot="others" slot-scope="{ google, map }">
             <spot v-for="(spot,i) in spots" :key="i" :google="google" :map="map" :spot="spot" />
             <map-overlay-test :google="google" :map="map" />
         </template>
@@ -28,19 +38,25 @@ Here is how `view/map/template.html` looks like:
 Because we want to wait for Google Map API to be ready,
 we use the component `component/google_map_loader`,
 which is basically a wrapper for [google-maps-api-loader](https://github.com/laurencedorman/google-maps-api-loader)
-with its template providing a simple slot like this:
+with its template providing some simple slots like this:
 
 ```
 <div class="google-map-loader">
-    <div id="map"></div>
+    <!-- "map" template is defined in "view/map" -->
+    <slot name="map"></slot>
     <template v-if="!!this.google && !!this.map">
-        <slot :google="google" :map="map" />
+        <!--
+             Provides "google" and "map" to <template /> defined in "views/map"
+             in which both scope properties are passed down to "components/spot".
+             ("components/spot" needs them for mapping jobs)
+        -->
+        <slot name="others" :google="google" :map="map" />
     </template>
 </div>
 ```
 
-Where its `<slot>` passing slot properties, namely "google" and "map",
-back to `view/map/template.html`.  
+Where the second &lt;slot name="others"&gt; is passing properties, namely `google` and `map`,
+back to `view/map/template.html` (forget about the first &lt;slot name="map"&gt; for now).  
 As you can see, within `view/map/template.html`,
 it is utilizing the provided `google` and `map`,
 this time, to two of the following child components:
