@@ -75,7 +75,6 @@ export default {
 };
 ```
 
-
 ### Sample Geo-Coordinates for d3 SVG Overlay
 
 For a given coordinates defined in a `geojson` file,
@@ -87,6 +86,51 @@ Bugis MRT: 103.8534648, 1.3008724
 Raffles Hotel: 103.8522904, 1.2948883
 Blu Jaz Cafe: 103.8567434, 1.3006284
 ```
+
+### Tips + More Details
+
+#### (a) d3 v4 uses "stream"
+
+[Since v4, d3 uses "stream" for all the map projection handlings](https://github.com/d3/d3-geo#streams).  
+Hence, the following projection convertor being used for path generator:  
+(found in `components/map_overlay_test/index.js`)
+
+```
+const projectorFactory = (google, projection, options = {}) => {
+  const { padding = 0 } = options;
+  const point = function pointStream(lng, lat) {
+    const d = projection.fromLatLngToDivPixel(new google.maps.LatLng(lat, lng));
+    const { x = 0, y = 0 } = d || {};
+    // console.log(`  { lng: ${lng}, lat: ${lat} } --> { x: ${x}, y: ${y} }`);
+    this.stream.point(x + padding, y + padding);
+  };
+  return d3.geoTransform({ point });
+};
+```
+
+and this is where the above is in use:
+
+```
+const projection = this.getProjection();
+const projector = projectorFactory(google, projection, { padding: DEFAULT_PADDING_SIZE });
+const pathGenerator = d3.geoPath().projection(projector);
+```
+
+#### (b) Delete SVG element upon every "draw"
+
+Notice, we have the following:  
+(found in `components/map_overlay_test/index.js`)
+
+```
+const layer = d3.select('.mLayer');
+layer.select('.msvg').remove();
+```
+
+Where `.msvg` is my arbituary class name given to the overlay &lt;svg&gt; element we have.  
+I'm deleting the &lt;svg&gt; element everytime the overlay is updated,
+because otherwise, the overlay remains when we drag the map around.
+
+
 
 ## 2. Notes
 
