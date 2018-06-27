@@ -44,20 +44,21 @@ The job for `components/google_map_loader` is to simply render a Google Map.
 It is basically a wrapper for [google-maps-api-loader](https://github.com/laurencedorman/google-maps-api-loader).
 By having `components/google_map_loader` as a separate component,
 we can automatically wait for whenever the map is ready.
-And, when it's ready, `view/map` can use &lt;slot-scope&gt;
-to receive 2 of the newly created objects passed from the wrapper component. Like this:
+
+Let's take a closer look at `view/map` template again.  
+As the wrapper component is ready, it is now ready to export its 2 props: `google` and `map`  
+For which, `view/map` can receive, using &lt;slot-scope&gt;, these newly created props.  
+Like this:
 
 ```
-    <google-map-loader>
         <template slot-scope="{ google, map }">
             <spot v-for="(spot,i) in spots" :key="i" :google="google" :map="map" :spot="spot" />
             <map-overlay-test :google="google" :map="map" />
         </template>
-    </google-map-loader>
 ```
 
 Notice also, as it receives `google` and `map` from the wrapper component,
-it is bypassing these 2 props, this time, to twwo of the following child components:
+it is now *bypassing* these 2 props, this time, to two of the following child components:
 
 - `components/spot`
 - `components/map-overlay-test`
