@@ -43,16 +43,17 @@ Within `components/google_map_loader`, we have the corresponding slots:
 The job for `components/google_map_loader` is to simply render a Google Map.
 It is basically a wrapper for [google-maps-api-loader](https://github.com/laurencedorman/google-maps-api-loader).
 By having `components/google_map_loader` as a separate component,
-we can automatically wait for whenever the map is ready.  
+we can automatically wait for whenever the map is ready.
 Whenever it's ready, `components/google_map_loader`
-uses Vue's &lt;slot-scope="*"&gt; feature
+uses Vue's &lt;slot-scope&gt;
 to pass 2 props, `google` and `map`, back to `view/map`
 
 ```
         <template slot="map-others" slot-scope="{ google, map }">
 ```
 
-So that `view/map` can now utilize these newly created props themselves.  
+So that `view/map` can now utilize these newly created props themselves.
+
 Again, looking at the template for `view/map`, we notice the following lines:
 
 ```
@@ -60,8 +61,10 @@ Again, looking at the template for `view/map`, we notice the following lines:
             <map-overlay-test :google="google" :map="map" />
 ```
 
-Meaning, `view/map` is now passing these props, this time, to other child components:
-`components/spot` and `components/map-overlay-test`
+Meaning, `view/map` is now passing these props, this time, to 2 other child components:
+
+- `components/spot`
+- `components/map-overlay-test`
 
 For the former, iterates an array, called`spots`,
 each of which contains geo-coordinates for a certain spot,
