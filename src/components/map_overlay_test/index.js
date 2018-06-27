@@ -3,18 +3,19 @@ import * as d3 from 'd3';
 import template from './template.html';
 import './style.styl';
 
-const DEFAULT_PADDING_SIZE = 5000;
-const DEFAULT_FILL_COLOR = '#ff0000';
-const DEFAULT_OPACITY = 0.65;
-
 // http://global.mapit.mysociety.org/area/973041.html
-// import central from '../../assets/json/singapore_central_973041.geojson';
+import singapore_central_geojson from '../../assets/json/singapore_central_973041.geojson';
 
-// Embedded GEOJSON for a simple test.
-const features = [
+const DEFAULT_PADDING_SIZE = 5000;
+
+const fill_color = { simple: '#ff0000', central: '#00ff90' };
+const opacity = { simple: 0.65, central: 0.2 };
+
+const data = {
+  // A sample set of coordinates, with its shape being a triangle.
+  simple: [
     {
       type: 'Feature',
-      id: 0,
       properties: { name: 'Singapore Sample' },
       geometry: {
         type: 'Polygon',
@@ -28,7 +29,16 @@ const features = [
         ]
       }
     }
-];
+  ],
+  // Another set of coordinates, this time, for Singapore's Central region.
+  central: [
+    {
+      type: 'Feature',
+      properties: { name: 'Singapore Central Area' },
+      geometry: singapore_central_geojson,
+    }
+  ],
+};
 
 /**
  * @returns {Function}
@@ -47,33 +57,28 @@ const projectorFactory = (google, projection, options = {}) => {
 /**
  * @returns {Function}
  */
-const drawFactory = google => function draw() {
+const drawFactory = ({ google, key }) => function draw() {
   const projection = this.getProjection();
   const projector = projectorFactory(google, projection, { padding: DEFAULT_PADDING_SIZE });
   const pathGenerator = d3.geoPath().projection(projector);
 
-  const layer = d3.select('.mLayer');
-  layer.select('.msvg').remove();
+  const layer = d3.select(`.layer-${key}`);
+  layer.select(`.svg-${key}`).remove();
 
-  const svg = layer.append('svg').attr('class', 'msvg');
-  const g = svg.append('g').attr('class', 'mLayerGroup');
+  const svg = layer.append('svg').attr('class', `svg-${key}`);
+  const g = svg.append('g').attr('class', `group-${key}`);
 
   g.selectAll('path')
-    .data(features)
+    .data(data[key])
     .enter()
     .append('path')
-    .attr('d', (d) => {
-      const c = pathGenerator(d);
-      // See if we have the generator command...
-      // console.log(`  c: ${c}`);
-      return c;
-    })
+    .attr('d', pathGenerator)
     .attr('class', (d) => {
       const { id: index } = d || {};
-      return `test-path-${index}`;
+      return `path-${key}-${index}`;
     })
-    .style('fill', DEFAULT_FILL_COLOR)
-    .style('opacity', DEFAULT_OPACITY);
+    .style('fill', fill_color[key])
+    .style('opacity', opacity[key]);
 };
 
 export default {
@@ -84,13 +89,15 @@ export default {
     map: Object, // Provided by "components/google_map_loader".
   },
   mounted() {
-    const self = this;
-    const overlay = new this.google.maps.OverlayView();
-    overlay.setMap(this.map);
-    overlay.onAdd = function onAdd() {
-      d3.select(this.getPanes().overlayLayer).append('div').attr('class', 'mLayer');
-      this.draw = drawFactory(self.google);
-    };
+    const { google } = this;
+    ['simple', 'central'].forEach((key) => {
+      const overlay = new this.google.maps.OverlayView();
+      overlay.setMap(this.map);
+      overlay.onAdd = function onAdd() {
+        d3.select(this.getPanes().overlayLayer).append('div').attr('class', `layer-${key}`)
+        this.draw = drawFactory({ google, key });
+      };
+    });
   },
 };
 
