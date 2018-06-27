@@ -10,6 +10,72 @@ vue-cli + Google Map + d3 (for SVG overlay example)
 2. Setup Google Map using "google-maps-api-loader".
 3. Using "d3" v5 to plot an overlay layer as SVG.
 
+### In Depth
+
+Here is how `view/map/template.html` looks like:
+
+```
+<div class="my-google-map">
+    <google-map-loader :api-key="apiKey" :config="config">
+        <template slot-scope="{ google, map }">
+            <spot v-for="(spot,i) in spots" :key="i" :google="google" :map="map" :spot="spot" />
+            <map-overlay-test :google="google" :map="map" />
+        </template>
+    </google-map-loader>
+</div>
+```
+
+Because we want to wait for Google Map API to be ready,
+we use the component `component/google_map_loader`,
+which is basically a wrapper for "google-maps-api-loader"
+with its template providing a simple slot like this:
+
+```
+<div class="google-map-loader">
+    <div id="map"></div>
+    <template v-if="!!this.google && !!this.map">
+        <slot :google="google" :map="map" />
+    </template>
+</div>
+```
+
+Where its `<slot>` passing slot properties, namely "google" and "map",
+back to `view/map/template.html`.  
+As you can see, within `view/map/template.html`,
+it is utilizing the provided "google" and "map",
+this time, to 2 of the child components:
+
+1. **<spot>** (which is defined in `components/spot`)
+2. **<map-overlay-test>** (which is defined in `components/map_overlay_test`)
+
+For the former iterates an array "spots"
+for each the location is rendered as a marker within `components/spot`.
+
+For the later, when "google" and "map" is given,
+adds a new Google Overlay View to the map,
+and projects a SVG rendered overlay of certain places:
+
+```
+export default {
+  name: 'map-overlay-test',
+  template,
+  props: {
+    google: Object, // Provided by "components/google_map_loader".
+    map: Object, // Provided by "components/google_map_loader".
+  },
+  mounted() {
+    const self = this;
+    const overlay = new this.google.maps.OverlayView();
+    overlay.setMap(this.map);
+    overlay.onAdd = function onAdd() {
+      d3.select(this.getPanes().overlayLayer).append('div').attr('class', 'mLayer');
+      this.draw = drawFactory(self.google);
+    };
+  },
+};
+```
+
+
 ### About Google Overlay + d3 SVG features
 
 For a given coordinates defined in a `geojson` file,
