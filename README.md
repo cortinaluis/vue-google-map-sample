@@ -44,29 +44,25 @@ The job for `components/google_map_loader` is to simply render a Google Map.
 It is basically a wrapper for [google-maps-api-loader](https://github.com/laurencedorman/google-maps-api-loader).
 By having `components/google_map_loader` as a separate component,
 we can automatically wait for whenever the map is ready.
-Whenever it's ready, `components/google_map_loader`
-uses Vue's &lt;slot-scope&gt;
-to pass 2 props, `google` and `map`, back to `view/map`
+And, when it's ready, `view/map` can use &lt;slot-scope&gt;
+to receive 2 of the newly created objects passed from the wrapper component. Like this:
 
 ```
-        <template slot="map-others" slot-scope="{ google, map }">
-```
-
-So that `view/map` can now utilize these newly created props themselves.
-
-Again, looking at the template for `view/map`, we notice the following lines:
-
-```
+    <google-map-loader>
+        <template slot-scope="{ google, map }">
             <spot v-for="(spot,i) in spots" :key="i" :google="google" :map="map" :spot="spot" />
             <map-overlay-test :google="google" :map="map" />
+        </template>
+    </google-map-loader>
 ```
 
-Meaning, `view/map` is now passing these props, this time, to 2 other child components:
+Notice also, as it receives `google` and `map` from the wrapper component,
+it is bypassing these 2 props, this time, to twwo of the following child components:
 
 - `components/spot`
 - `components/map-overlay-test`
 
-For the former, iterates an array, called`spots`,
+For the former, iterates an array, called `spots`,
 each of which contains geo-coordinates for a certain spot,
 and is rendered into a marker on the map
 according to the rules defined in `components/spot`.
