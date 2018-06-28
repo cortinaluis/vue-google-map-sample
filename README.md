@@ -81,56 +81,76 @@ export default {
     map: Object, // Provided by "components/google_map_loader".
   },
   mounted() {
-    const self = this;
-    const overlay = new this.google.maps.OverlayView();
-    overlay.setMap(this.map);
-    overlay.onAdd = function onAdd() {
-      d3.select(this.getPanes().overlayLayer).append('div').attr('class', 'mLayer');
-      this.draw = drawFactory(self.google);
-    };
+    const { google, map } = this;
+    makeOverlaySimple({ google, map });
+    makeOverlaySingaporeCentral({ google, map });
   },
 };
 ```
 
-### Sample Geo-Coordinates for d3 SVG Overlay
-
-For a given coordinates defined in a `geojson` file,
-projects them as SVG using [d3 v5](https://d3js.org/) on a Google Overlay layer.  
-Currently has three of the following spots (in Singapore) for the overlay.
+Bellow is just an example to illustrate how the d3 overlay is created:
 
 ```
-Bugis MRT: 103.8534648, 1.3008724
-Raffles Hotel: 103.8522904, 1.2948883
-Blu Jaz Cafe: 103.8567434, 1.3006284
+const makeOverlaySingaporeCentral = compose(
+  setOverlay,
+  (o = {}) => {
+    const { google } = o;
+    const key = 'central';
+    const layer_name = getLayerName(key);
+    const svg_name = getSvgName(key);
+    const group_name = getGroupName(key);
+    const fill = PATH_SETTINGS.fill[key];
+    const opacity = PATH_SETTINGS.opacity[key];
+    const draw = function draw() {
+      const layer = d3.select(`.${layer_name}`);
+      layer.select(`.${svg_name}`).remove();
+      const svg = layer.append('svg').attr('class', svg_name);
+      const g = svg.append('g').attr('class', group_name);
+      const projection = this.getProjection();
+      const options = { padding: DEFAULT_PADDING_SIZE };
+      const pathGenerator = pathGeneratorFactory({ google, projection, options });
+      g.selectAll('path')
+        .data(data[key])
+        .enter()
+        .append('path')
+        .attr('d', pathGenerator)
+        .attr('class', getPathName(key))
+        .style('fill', fill)
+        .style('opacity', opacity);
+    };
+    return { ...o, key, draw };
+  },
+);
 ```
 
-### Tips + More Details
+
+### Tips + More
 
 #### (a) d3 v4 uses "stream"
 
-[Since v4, d3 uses "stream" for all the map projection handlings](https://github.com/d3/d3-geo#streams).  
-Hence, the following projection convertor being used for path generator:  
-(found in `components/map_overlay_test/index.js`)
+[Since v4, d3 uses "stream" for all the map projection handlings](https://github.com/d3/d3-geo#streams).
+Hence, we need the following function (found in `components/map_overlay_test/index.js`)
+to convert (1) coodinates to a stream, and (2) stream to d3 path:
 
 ```
-const projectorFactory = (google, projection, options = {}) => {
-  const { padding = 0 } = options;
+const projectorFactory = ({ google, projection, options }) => {
+  const { padding = DEFAULT_PADDING_SIZE } = options || {};
   const point = function pointStream(lng, lat) {
     const d = projection.fromLatLngToDivPixel(new google.maps.LatLng(lat, lng));
     const { x = 0, y = 0 } = d || {};
-    // console.log(`  { lng: ${lng}, lat: ${lat} } --> { x: ${x}, y: ${y} }`);
     this.stream.point(x + padding, y + padding);
   };
-  return d3.geoTransform({ point });
+  return d3.geoPath().projection(
+    d3.geoTransform({ point })
+  );
 };
 ```
 
-and this is where the above is in use:
+and bellow is where the above function is in use:
 
 ```
 const projection = this.getProjection();
-const projector = projectorFactory(google, projection, { padding: DEFAULT_PADDING_SIZE });
-const pathGenerator = d3.geoPath().projection(projector);
+const projector = projectorFactory({ google, projection });
 ```
 
 #### (b) Delete SVG element upon every "draw"
