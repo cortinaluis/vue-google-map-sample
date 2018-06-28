@@ -9,10 +9,21 @@ import './style.styl';
 import singapore_central_geojson from '../../assets/json/singapore_central_973041.geojson';
 
 const DEFAULT_PADDING_SIZE = 5000;
-const PATH_SETTINGS = {
-  fill: { simple: '#ff0000', central: '#009090' },
-  opacity: { simple: 0.4, central: 0.4 }
-};
+
+const getFillColor = (mapping => (key => mapping[key]))({
+  simple: '#ff0000',
+  singapore_central: '#009090',
+});
+
+const getOpacity = (mapping => (key => mapping[key]))({
+  simple: 0.4,
+  singapore_central: 0.4,
+});
+
+const getLayerName = key => (key && `layer-${key}`) || 'mlayer';
+const getSvgName = key => (key && `svg-${key}`) || 'msvg';
+const getGroupName = key => (key && `group-${key}`) || 'mgroup';
+const getPathName = key => d => (`path-${key}${(d && d.id && `-${d.id}`) || ''}`);
 
 const data = {
   // A sample set of coordinates, with its shape being a triangle.
@@ -34,7 +45,7 @@ const data = {
     }
   ],
   // Another set of coordinates, this time, for Singapore's Central region.
-  central: [
+  singapore_central: [
     {
       type: 'Feature',
       properties: { name: 'Singapore Central Area' },
@@ -42,11 +53,6 @@ const data = {
     }
   ],
 };
-
-const getLayerName = key => (key && `layer-${key}`) || 'mlayer';
-const getSvgName = key => (key && `svg-${key}`) || 'msvg';
-const getGroupName = key => (key && `group-${key}`) || 'mgroup';
-const getPathName = key => d => (`path-${key}${(d && d.id && `-${d.id}`) || ''}`);
 
 const projectorFactory = ({ google, projection, options }) => {
   const { padding = DEFAULT_PADDING_SIZE } = options || {};
@@ -60,6 +66,18 @@ const projectorFactory = ({ google, projection, options }) => {
   );
 };
 
+const initOverlay = key => (o = {}) => ({
+  ...o,
+  ...{
+    key,
+    layer_name: getLayerName(key),
+    svg_name: getSvgName(key),
+    group_name: getGroupName(key),
+    fill: getFillColor(key),
+    opacity: getOpacity(key),
+  },
+});
+
 const setOverlay = (o = {}) => {
   const { google, map, key, draw } = o;
   const overlay = new google.maps.OverlayView();
@@ -71,64 +89,58 @@ const setOverlay = (o = {}) => {
   return o;
 };
 
-const makeOverlaySimple = compose(
+const makeSimple = compose(
   setOverlay,
   (o = {}) => {
-    const { google } = o;
-    const key = 'simple';
-    const layer_name = getLayerName(key);
-    const svg_name = getSvgName(key);
-    const group_name = getGroupName(key);
-    const fill = PATH_SETTINGS.fill[key];
-    const opacity = PATH_SETTINGS.opacity[key];
-    const draw = function draw() {
-      const layer = d3.select(`.${layer_name}`);
-      layer.select(`.${svg_name}`).remove();
-      const svg = layer.append('svg').attr('class', svg_name);
-      const g = svg.append('g').attr('class', group_name);
-      const projection = this.getProjection();
-      const projector = projectorFactory({ google, projection });
-      g.selectAll('path')
-        .data(data[key])
-        .enter()
-        .append('path')
-        .attr('d', projector)
-        .attr('class', getPathName(key))
-        .style('fill', fill)
-        .style('opacity', opacity);
+    const { google, key, layer_name, svg_name, group_name, fill, opacity } = o;
+    return {
+      ...o,
+      draw: function draw() {
+        const layer = d3.select(`.${layer_name}`);
+        layer.select(`.${svg_name}`).remove();
+        const svg = layer.append('svg').attr('class', svg_name);
+        const g = svg.append('g').attr('class', group_name);
+        const projection = this.getProjection();
+        const projector = projectorFactory({ google, projection });
+        g.selectAll('path')
+          .data(data[key])
+          .enter()
+          .append('path')
+          .attr('d', projector)
+          .attr('class', getPathName(key))
+          .style('fill', fill)
+          .style('opacity', opacity);
+      },
     };
-    return { ...o, key, draw };
   },
+  initOverlay('simple'),
 );
 
-const makeOverlaySingaporeCentral = compose(
+const makeSingaporeCentral = compose(
   setOverlay,
   (o = {}) => {
-    const { google } = o;
-    const key = 'central';
-    const layer_name = getLayerName(key);
-    const svg_name = getSvgName(key);
-    const group_name = getGroupName(key);
-    const fill = PATH_SETTINGS.fill[key];
-    const opacity = PATH_SETTINGS.opacity[key];
-    const draw = function draw() {
-      const layer = d3.select(`.${layer_name}`);
-      layer.select(`.${svg_name}`).remove();
-      const svg = layer.append('svg').attr('class', svg_name);
-      const g = svg.append('g').attr('class', group_name);
-      const projection = this.getProjection();
-      const projector = projectorFactory({ google, projection });
-      g.selectAll('path')
-        .data(data[key])
-        .enter()
-        .append('path')
-        .attr('d', projector)
-        .attr('class', getPathName(key))
-        .style('fill', fill)
-        .style('opacity', opacity);
+    const { google, key, layer_name, svg_name, group_name, fill, opacity } = o;
+    return {
+      ...o,
+      draw: function draw() {
+        const layer = d3.select(`.${layer_name}`);
+        layer.select(`.${svg_name}`).remove();
+        const svg = layer.append('svg').attr('class', svg_name);
+        const g = svg.append('g').attr('class', group_name);
+        const projection = this.getProjection();
+        const projector = projectorFactory({ google, projection });
+        g.selectAll('path')
+          .data(data[key])
+          .enter()
+          .append('path')
+          .attr('d', projector)
+          .attr('class', getPathName(key))
+          .style('fill', fill)
+          .style('opacity', opacity);
+      },
     };
-    return { ...o, key, draw };
   },
+  initOverlay('singapore_central'),
 );
 
 export default {
@@ -140,8 +152,8 @@ export default {
   },
   mounted() {
     const { google, map } = this;
-    makeOverlaySimple({ google, map });
-    makeOverlaySingaporeCentral({ google, map });
+    makeSimple({ google, map });
+    makeSingaporeCentral({ google, map });
   },
 };
 

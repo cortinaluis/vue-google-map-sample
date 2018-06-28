@@ -82,8 +82,8 @@ export default {
   },
   mounted() {
     const { google, map } = this;
-    makeOverlaySimple({ google, map });
-    makeOverlaySingaporeCentral({ google, map });
+    makeSimple({ google, map });
+    makeSingaporeCentral({ google, map });
   },
 };
 ```
@@ -91,35 +91,31 @@ export default {
 Bellow is just an example to illustrate how the d3 overlay is created:
 
 ```
-const makeOverlaySingaporeCentral = compose(
+const makeSingaporeCentral = compose(
   setOverlay,
   (o = {}) => {
-    const { google } = o;
-    const key = 'central';
-    const layer_name = getLayerName(key);
-    const svg_name = getSvgName(key);
-    const group_name = getGroupName(key);
-    const fill = PATH_SETTINGS.fill[key];
-    const opacity = PATH_SETTINGS.opacity[key];
-    const draw = function draw() {
-      const layer = d3.select(`.${layer_name}`);
-      layer.select(`.${svg_name}`).remove();
-      const svg = layer.append('svg').attr('class', svg_name);
-      const g = svg.append('g').attr('class', group_name);
-      const projection = this.getProjection();
-      const options = { padding: DEFAULT_PADDING_SIZE };
-      const pathGenerator = pathGeneratorFactory({ google, projection, options });
-      g.selectAll('path')
-        .data(data[key])
-        .enter()
-        .append('path')
-        .attr('d', pathGenerator)
-        .attr('class', getPathName(key))
-        .style('fill', fill)
-        .style('opacity', opacity);
+    const { google, key, layer_name, svg_name, group_name, fill, opacity } = o;
+    return {
+      ...o,
+      draw: function draw() {
+        const layer = d3.select(`.${layer_name}`);
+        layer.select(`.${svg_name}`).remove();
+        const svg = layer.append('svg').attr('class', svg_name);
+        const g = svg.append('g').attr('class', group_name);
+        const projection = this.getProjection();
+        const projector = projectorFactory({ google, projection });
+        g.selectAll('path')
+          .data(data[key])
+          .enter()
+          .append('path')
+          .attr('d', projector)
+          .attr('class', getPathName(key))
+          .style('fill', fill)
+          .style('opacity', opacity);
+      },
     };
-    return { ...o, key, draw };
   },
+  initOverlay('singapore_central'),
 );
 ```
 
