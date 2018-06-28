@@ -117,6 +117,29 @@ const makeSingaporeCentral = compose(
   },
   initOverlay('singapore_central'),
 );
+
+const initOverlay = key => (o = {}) => ({
+  ...o,
+  ...{
+    key,
+    layer_name: getLayerName(key),
+    svg_name: getSvgName(key),
+    group_name: getGroupName(key),
+    fill: getFillColor(key),
+    opacity: getOpacity(key),
+  },
+});
+
+const setOverlay = (o = {}) => {
+  const { google, map, key, draw } = o;
+  const overlay = new google.maps.OverlayView();
+  overlay.setMap(map);
+  overlay.onAdd = function onAdd() {
+    d3.select(this.getPanes().overlayLayer).append('div').attr('class', getLayerName(key));
+    this.draw = draw;
+  };
+  return o;
+};
 ```
 
 
