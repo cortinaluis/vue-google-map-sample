@@ -46,8 +46,8 @@ By having `components/google_map_loader` as a separate component,
 we can automatically wait for whenever the map is ready.
 
 Let's take a closer look at `view/map` template again.  
-As the wrapper component is ready, it is now ready to export its 2 props: `google` and `map`  
-`view/map` uses &lt;slot-scope&gt; to destructure these newly created props for its own use.  
+As the wrapper component is ready, it is now ready to export its 2 props, namely, `google` and `map`.  
+For `view/map` uses &lt;slot-scope&gt;, it now receives these props by destructuring them.  
 Like this:
 
 ```
