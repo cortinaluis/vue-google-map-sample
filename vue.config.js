@@ -1,4 +1,5 @@
 module.exports = {
+  baseUrl: '/minagawah/vue-google-map-sample/',
   configureWebpack: {
     module: {
       rules: [
