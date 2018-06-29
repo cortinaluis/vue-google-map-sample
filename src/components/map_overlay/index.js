@@ -137,7 +137,7 @@ const setSingapore = compose(
 );
 
 export default {
-  name: 'map-overlay-test',
+  name: 'map-overlay',
   template,
   props: {
     google: Object, // Provided by "components/google_map_loader".

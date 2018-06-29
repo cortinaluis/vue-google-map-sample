@@ -22,7 +22,7 @@ Here is how the template for `view/map` look like:
         </template>
         <template slot="map-others" slot-scope="{ google, map }">
             <map-marker v-for="(marker,i) in markers" :key="i" :google="google" :map="map" :marker="marker" />
-            <map-overlay-test :google="google" :map="map" />
+            <map-overlay :google="google" :map="map" />
         </template>
     </google-map-loader>
 </div>
@@ -53,7 +53,7 @@ Like this:
 ```
         <template slot-scope="{ google, map }">
             <map-marker v-for="(marker,i) in markers" :key="i" :google="google" :map="map" :marker="marker" />
-            <map-overlay-test :google="google" :map="map" />
+            <map-overlay :google="google" :map="map" />
         </template>
 ```
 
@@ -61,7 +61,7 @@ Notice also, as it receives `google` and `map` from the wrapper component,
 it is now *bypassing* these 2 props, this time, to two of the following child components:
 
 Component 1: `components/map_marker`  
-Component 2: `components/map_overlay_test`
+Component 2: `components/map_overlay`
 
 #### Component 1: "components/map_marker"
 
@@ -108,17 +108,17 @@ export default {
 };
 ```
 
-#### Component 2: "components/map_overlay_test"
+#### Component 2: "components/map_overlay"
 
 For the later, when `google` and `map` is given,
 adds a new Google Overlay View to the map,
 and projects a SVG rendered overlay of certain places:
 
-components/map_overlay_test/index.js:
+components/map_overlay/index.js:
 
 ```
 export default {
-  name: 'map-overlay-test',
+  name: 'map-overlay',
   template,
   props: {
     google: Object, // Provided by "components/google_map_loader".
@@ -192,7 +192,7 @@ const setOverlay = (o) => {
 #### (a) d3 v4 uses "stream"
 
 [Since v4, d3 uses "stream" for all the map projection handlings](https://github.com/d3/d3-geo#streams).
-Hence, we need the following function (found in `components/map_overlay_test/index.js`)
+Hence, we need the following function (found in `components/map_overlay/index.js`)
 to convert (1) coodinates to a stream, and (2) stream to d3 path:
 
 ```
@@ -216,7 +216,7 @@ const projector = projectorFactory({ google, projection });
 #### (b) Delete SVG element upon every "draw"
 
 Notice, we have the following:  
-(found in `components/map_overlay_test/index.js`)
+(found in `components/map_overlay/index.js`)
 
 ```
 const layer = d3.select(`.${layer_name}`);
@@ -230,7 +230,7 @@ because otherwise, the overlay remains when we drag the map around.
 
 #### (c) Weird Clipping on Overlay Layer
 
-Look at the bellow description in `components/map_overlay_test/style.styl`:
+Look at the bellow description in `components/map_overlay/style.styl`:
 
 ```
 svg

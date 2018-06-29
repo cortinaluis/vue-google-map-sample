@@ -1,7 +1,7 @@
 /* eslint no-unused-vars: [1] */
 import GoogleMapLoader from '@/components/google_map_loader';
 import MapMarker from '@/components/map_marker';
-import MapOverlayTest from '@/components/map_overlay_test';
+import MapOverlay from '@/components/map_overlay';
 
 import template from './template.html';
 import './style.styl';
@@ -35,7 +35,7 @@ export default {
   components: {
     GoogleMapLoader,
     MapMarker,
-    MapOverlayTest,
+    MapOverlay,
   },
   methods: {
     isReady() {
