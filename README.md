@@ -21,7 +21,7 @@ Here is how the template for `view/map` look like:
             <div v-bind:id="mapElemId" />
         </template>
         <template slot="map-others" slot-scope="{ google, map }">
-            <marker v-for="(marker,i) in markers" :key="i" :google="google" :map="map" :marker="marker" />
+            <map-marker v-for="(marker,i) in markers" :key="i" :google="google" :map="map" :marker="marker" />
             <map-overlay-test :google="google" :map="map" />
         </template>
     </google-map-loader>
@@ -52,7 +52,7 @@ Like this:
 
 ```
         <template slot-scope="{ google, map }">
-            <marker v-for="(marker,i) in markers" :key="i" :google="google" :map="map" :marker="marker" />
+            <map-marker v-for="(marker,i) in markers" :key="i" :google="google" :map="map" :marker="marker" />
             <map-overlay-test :google="google" :map="map" />
         </template>
 ```
@@ -60,17 +60,61 @@ Like this:
 Notice also, as it receives `google` and `map` from the wrapper component,
 it is now *bypassing* these 2 props, this time, to two of the following child components:
 
-- `components/marker`
-- `components/map-overlay-test`
+(1) `components/map_marker`
+(2) `components/map_overlay_test`
+
+#### (1) components/map_marker
 
 For the former, iterates an array, called `markers`,
 each of which contains geo-coordinates for a certain marker,
 and is rendered into a marker on the map
-according to the rules defined in `components/marker`.
+according to the rules defined in `components/map_marker`.
+
+*view/map/index.js:*
+
+```
+const markers = [
+  { name: 'Blu Jaz Cafe', lng: 103.8567434, lat: 1.3006284 },
+  { name: 'Candour Coffee', lng: 103.8557405, lat: 1.2960791 },
+  { name: 'Bugis MRT', lng: 103.8534648, lat: 1.3008724 },
+  { name: 'Book Point', lng: 103.8525092, lat: 1.2969103 },
+  { name: 'Raffles Hotel', lng: 103.8522904, lat: 1.2948883 },
+  { name: 'Singapore Botanic Gardens', lng: 103.8137249, lat: 1.3138451 },
+  { name: 'Changi Airport Singapore', lng: 103.9893421, lat: 1.3644256 },
+];
+```
+
+*components/map_marker/index.js:*
+
+```
+export default {
+  name: 'map-marker',
+  template,
+  props: {
+    google: Object, // Provided by "components/google_map_loader".
+    map: Object, // Provided by "components/google_map_loader".
+    marker: Object, // Given directly from "views/map".
+  },
+  data() {
+    return { spot: null };
+  },
+  mounted() {
+    const { map } = this;
+    const { Marker } = this.google.maps;
+    const { name: title, lat, lng } = this.marker || {};
+    const position = { lat, lng };
+    this.spot = new Marker({ title, map, position });
+  },
+};
+```
+
+#### (2) components/map_overlay_test
 
 For the later, when `google` and `map` is given,
 adds a new Google Overlay View to the map,
 and projects a SVG rendered overlay of certain places:
+
+*components/map_overlay_test/index.js:*
 
 ```
 export default {

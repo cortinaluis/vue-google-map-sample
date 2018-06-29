@@ -11,7 +11,7 @@
              Also, notice we are directly passing "marker" to "components/marker".
         -->
         <template slot="map-others" slot-scope="{ google, map }">
-            <marker v-for="(marker,i) in markers" :key="i" :google="google" :map="map" :marker="marker" />
+            <map-marker v-for="(marker,i) in markers" :key="i" :google="google" :map="map" :marker="marker" />
             <map-overlay-test :google="google" :map="map" />
         </template>
     </google-map-loader>
