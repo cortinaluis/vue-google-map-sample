@@ -57,29 +57,27 @@ const projectorFactory = ({ google, projection, options }) => {
     const { x = 0, y = 0 } = d || {};
     this.stream.point(x + padding, y + padding);
   };
-  return d3.geoPath().projection(
-    d3.geoTransform({ point })
-  );
+  return d3.geoPath().projection(d3.geoTransform({ point }));
 };
 
 const initOverlay = key => (o = {}) => ({
   ...o,
   ...{
     key,
-    layer_name: getLayerName(key),
-    svg_name: getSvgName(key),
-    group_name: getGroupName(key),
-    fill: getFillColor(key),
-    opacity: getOpacity(key),
+    layer_name:  getLayerName(key),
+    svg_name:    getSvgName(key),
+    group_name:  getGroupName(key),
+    fill:        getFillColor(key),
+    opacity:     getOpacity(key),
   },
 });
 
 const setOverlay = (o = {}) => {
-  const { google, map, key, draw } = o;
+  const { google, map, layer_name, draw } = o;
   const overlay = new google.maps.OverlayView();
   overlay.setMap(map);
   overlay.onAdd = function onAdd() {
-    d3.select(this.getPanes().overlayLayer).append('div').attr('class', getLayerName(key));
+    d3.select(this.getPanes().overlayLayer).append('div').attr('class', layer_name);
     this.draw = draw;
   };
   return o;
@@ -92,12 +90,12 @@ const setTriangle = compose(
     return {
       ...o,
       draw: function draw() {
+        const projection = this.getProjection();
+        const projector = projectorFactory({ google, projection });
         const layer = d3.select(`.${layer_name}`);
         layer.select(`.${svg_name}`).remove();
         const svg = layer.append('svg').attr('class', svg_name);
         const g = svg.append('g').attr('class', group_name);
-        const projection = this.getProjection();
-        const projector = projectorFactory({ google, projection });
         g.selectAll('path')
           .data(triangle_data)
           .enter()

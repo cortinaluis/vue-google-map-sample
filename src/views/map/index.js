@@ -1,18 +1,17 @@
 /* eslint no-unused-vars: [1] */
 import GoogleMapLoader from '@/components/google_map_loader';
-import Spot from '@/components/spot';
+import Marker from '@/components/marker';
 import MapOverlayTest from '@/components/map_overlay_test';
 
 import template from './template.html';
 import './style.styl';
 
-const MAP_ELEMENT_ID = 'my-google-map';
-const API_KEY = 'AIzaSyDtDdWEh0tzu4bbIic4Sa68iPOgYbkF3h8';
-const CENTER_SPOT = { name: 'Raffles Hotel', lat: 1.2953139, lng: 103.8524867 };
-const DEFAULT_ZOOM = 10.5;
+const mapElemId = 'my-google-map';
+const apiKey = 'AIzaSyDtDdWEh0tzu4bbIic4Sa68iPOgYbkF3h8';
+const center = { name: 'Raffles Hotel', lat: 1.2953139, lng: 103.8524867 };
+const zoom = 10.5;
 
-// http://global.mapit.mysociety.org/area/973041.html
-const SPOT_LIST = [
+const markers = [
   { name: 'Blu Jaz Cafe', lng: 103.8567434, lat: 1.3006284 },
   { name: 'Candour Coffee', lng: 103.8557405, lat: 1.2960791 },
   { name: 'Bugis MRT', lng: 103.8534648, lat: 1.3008724 },
@@ -27,18 +26,15 @@ export default {
   template,
   data() {
     return {
-      mapElemId: MAP_ELEMENT_ID,
-      apiKey: API_KEY,
-      spots: SPOT_LIST,
-      config: {
-        zoom: DEFAULT_ZOOM,
-        center: CENTER_SPOT,
-      },
+      mapElemId,
+      apiKey,
+      markers,
+      config: { zoom, center },
     };
   },
   components: {
     GoogleMapLoader,
-    Spot,
+    Marker,
     MapOverlayTest,
   },
   methods: {

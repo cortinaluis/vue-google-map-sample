@@ -2,7 +2,7 @@
 import template from './template.html';
 
 export default {
-  name: 'spot',
+  name: 'marker',
   template,
   props: {
     google: Object, // Provided by "components/google_map_loader".

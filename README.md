@@ -21,7 +21,7 @@ Here is how the template for `view/map` look like:
             <div v-bind:id="mapElemId" />
         </template>
         <template slot="map-others" slot-scope="{ google, map }">
-            <spot v-for="(spot,i) in spots" :key="i" :google="google" :map="map" :spot="spot" />
+            <marker v-for="(marker,i) in markers" :key="i" :google="google" :map="map" :marker="marker" />
             <map-overlay-test :google="google" :map="map" />
         </template>
     </google-map-loader>
@@ -52,7 +52,7 @@ Like this:
 
 ```
         <template slot-scope="{ google, map }">
-            <spot v-for="(spot,i) in spots" :key="i" :google="google" :map="map" :spot="spot" />
+            <marker v-for="(marker,i) in markers" :key="i" :google="google" :map="map" :marker="marker" />
             <map-overlay-test :google="google" :map="map" />
         </template>
 ```
@@ -60,13 +60,13 @@ Like this:
 Notice also, as it receives `google` and `map` from the wrapper component,
 it is now *bypassing* these 2 props, this time, to two of the following child components:
 
-- `components/spot`
+- `components/marker`
 - `components/map-overlay-test`
 
-For the former, iterates an array, called `spots`,
-each of which contains geo-coordinates for a certain spot,
+For the former, iterates an array, called `markers`,
+each of which contains geo-coordinates for a certain marker,
 and is rendered into a marker on the map
-according to the rules defined in `components/spot`.
+according to the rules defined in `components/marker`.
 
 For the later, when `google` and `map` is given,
 adds a new Google Overlay View to the map,
@@ -131,11 +131,11 @@ const initOverlay = key => (o = {}) => ({
 });
 
 const setOverlay = (o = {}) => {
-  const { google, map, key, draw } = o;
+  const { google, map, layer_name, draw } = o;
   const overlay = new google.maps.OverlayView();
   overlay.setMap(map);
   overlay.onAdd = function onAdd() {
-    d3.select(this.getPanes().overlayLayer).append('div').attr('class', getLayerName(key));
+    d3.select(this.getPanes().overlayLayer).append('div').attr('class', layer_name);
     this.draw = draw;
   };
   return o;
@@ -159,9 +159,7 @@ const projectorFactory = ({ google, projection, options }) => {
     const { x = 0, y = 0 } = d || {};
     this.stream.point(x + padding, y + padding);
   };
-  return d3.geoPath().projection(
-    d3.geoTransform({ point })
-  );
+  return d3.geoPath().projection(d3.geoTransform({ point }));
 };
 ```
 
@@ -186,6 +184,29 @@ Where `.msvg` is my arbituary class name given to the overlay &lt;svg&gt; elemen
 I'm deleting the &lt;svg&gt; element everytime the overlay is updated,
 because otherwise, the overlay remains when we drag the map around.
 
+
+#### (c) Weird Clipping on Overlay Layer
+
+Look at the bellow description in `components/map_overlay_test/style.styl`:
+
+```
+svg
+    position: absolute
+    top: -5000px
+    left: -5000px
+    width: 9000px
+    height: 9000px
+```
+
+We intentionally shift all the SVG elements by -5000px.
+This is to prevent a weird clipping on Google Overlay view
+whenever dragging the map around.
+At the time we render the actual overlay,
+we set "top" and "left" back to the original position by adding 5000px.
+
+```
+    this.stream.point(x + padding, y + padding);
+```
 
 
 ## 2. Notes
