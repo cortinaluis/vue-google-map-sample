@@ -5,54 +5,50 @@ import * as d3 from 'd3';
 import template from './template.html';
 import './style.styl';
 
-// http://global.mapit.mysociety.org/area/973041.html
-import singapore_central_geojson from '../../assets/json/singapore_central_973041.geojson';
+// https://data.gov.sg/dataset/master-plan-2014-region-boundary-web
+import singapore_data from '../../assets/json/MP14_REGION_WEB_PL.geojson';
 
+const triangle_data = [
+  {
+    type: 'Feature',
+    properties: { name: 'Singapore Sample' },
+    geometry: {
+      type: 'Polygon',
+      coordinates: [
+        [
+          [103.8137249, 1.3138451], // Singapore Botanic Gardens
+          [103.9893421, 1.3644256], // Changi Airport Singapore
+          [103.8522904, 1.2948883], // Raffles Hotel
+          [103.8137249, 1.3138451],
+        ]
+      ]
+    }
+  }
+];
+
+// To prevent the weird overlay clipping when dragging the map around,
+// we intentionally shift "top" and "left" of the SVG element,
+// and later position them back to the original position.
 const DEFAULT_PADDING_SIZE = 5000;
-
-const getFillColor = (mapping => (key => mapping[key]))({
-  simple: '#ff0000',
-  singapore_central: '#009090',
-});
-
-const getOpacity = (mapping => (key => mapping[key]))({
-  simple: 0.4,
-  singapore_central: 0.4,
-});
 
 const getLayerName = key => (key && `layer-${key}`) || 'mlayer';
 const getSvgName = key => (key && `svg-${key}`) || 'msvg';
 const getGroupName = key => (key && `group-${key}`) || 'mgroup';
 const getPathName = key => d => (`path-${key}${(d && d.id && `-${d.id}`) || ''}`);
 
-const data = {
-  // A sample set of coordinates, with its shape being a triangle.
-  simple: [
-    {
-      type: 'Feature',
-      properties: { name: 'Singapore Sample' },
-      geometry: {
-        type: 'Polygon',
-        coordinates: [
-          [
-            [103.8137249, 1.3138451], // Singapore Botanic Gardens
-            [103.9893421, 1.3644256], // Changi Airport Singapore
-            [103.8522904, 1.2948883], // Raffles Hotel
-            [103.8137249, 1.3138451],
-          ]
-        ]
-      }
-    }
-  ],
-  // Another set of coordinates, this time, for Singapore's Central region.
-  singapore_central: [
-    {
-      type: 'Feature',
-      properties: { name: 'Singapore Central Area' },
-      geometry: singapore_central_geojson,
-    }
-  ],
-};
+const colorScale = d3.scaleLinear()
+      .domain([1, singapore_data.features.length])
+      .range(['#ff80de', '#101080']);
+
+const getFillColor = (mapping => (key => mapping[key]))({
+  triangle: '#ff0000',
+  singapore: '#009090',
+});
+
+const getOpacity = (mapping => (key => mapping[key]))({
+  triangle: 0.4,
+  singapore: 0.4,
+});
 
 const projectorFactory = ({ google, projection, options }) => {
   const { padding = DEFAULT_PADDING_SIZE } = options || {};
@@ -89,7 +85,7 @@ const setOverlay = (o = {}) => {
   return o;
 };
 
-const makeSimple = compose(
+const setTriangle = compose(
   setOverlay,
   (o = {}) => {
     const { google, key, layer_name, svg_name, group_name, fill, opacity } = o;
@@ -103,7 +99,7 @@ const makeSimple = compose(
         const projection = this.getProjection();
         const projector = projectorFactory({ google, projection });
         g.selectAll('path')
-          .data(data[key])
+          .data(triangle_data)
           .enter()
           .append('path')
           .attr('d', projector)
@@ -113,34 +109,34 @@ const makeSimple = compose(
       },
     };
   },
-  initOverlay('simple'),
+  initOverlay('triangle'),
 );
 
-const makeSingaporeCentral = compose(
+const setSingapore = compose(
   setOverlay,
   (o = {}) => {
     const { google, key, layer_name, svg_name, group_name, fill, opacity } = o;
     return {
       ...o,
       draw: function draw() {
+        const projection = this.getProjection();
+        const projector = projectorFactory({ google, projection });
         const layer = d3.select(`.${layer_name}`);
         layer.select(`.${svg_name}`).remove();
         const svg = layer.append('svg').attr('class', svg_name);
         const g = svg.append('g').attr('class', group_name);
-        const projection = this.getProjection();
-        const projector = projectorFactory({ google, projection });
         g.selectAll('path')
-          .data(data[key])
+          .data(singapore_data.features)
           .enter()
           .append('path')
           .attr('d', projector)
           .attr('class', getPathName(key))
-          .style('fill', fill)
+          .style('fill', (d, i) => colorScale(i) || fill)
           .style('opacity', opacity);
       },
     };
   },
-  initOverlay('singapore_central'),
+  initOverlay('singapore'),
 );
 
 export default {
@@ -152,8 +148,8 @@ export default {
   },
   mounted() {
     const { google, map } = this;
-    makeSimple({ google, map });
-    makeSingaporeCentral({ google, map });
+    setTriangle({ google, map });
+    setSingapore({ google, map });
   },
 };
 

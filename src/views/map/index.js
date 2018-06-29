@@ -9,7 +9,7 @@ import './style.styl';
 const MAP_ELEMENT_ID = 'my-google-map';
 const API_KEY = 'AIzaSyDtDdWEh0tzu4bbIic4Sa68iPOgYbkF3h8';
 const CENTER_SPOT = { name: 'Raffles Hotel', lat: 1.2953139, lng: 103.8524867 };
-const DEFAULT_ZOOM = 12;
+const DEFAULT_ZOOM = 10.5;
 
 // http://global.mapit.mysociety.org/area/973041.html
 const SPOT_LIST = [

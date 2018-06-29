@@ -82,8 +82,8 @@ export default {
   },
   mounted() {
     const { google, map } = this;
-    makeSimple({ google, map });
-    makeSingaporeCentral({ google, map });
+    setTriangle({ google, map });
+    setSingapore({ google, map });
   },
 };
 ```
@@ -91,31 +91,31 @@ export default {
 Bellow is just an example to illustrate how the d3 overlay is created:
 
 ```
-const makeSingaporeCentral = compose(
+const setSingapore = compose(
   setOverlay,
   (o = {}) => {
     const { google, key, layer_name, svg_name, group_name, fill, opacity } = o;
     return {
       ...o,
       draw: function draw() {
+        const projection = this.getProjection();
+        const projector = projectorFactory({ google, projection });
         const layer = d3.select(`.${layer_name}`);
         layer.select(`.${svg_name}`).remove();
         const svg = layer.append('svg').attr('class', svg_name);
         const g = svg.append('g').attr('class', group_name);
-        const projection = this.getProjection();
-        const projector = projectorFactory({ google, projection });
         g.selectAll('path')
-          .data(data[key])
+          .data(singapore_data.features)
           .enter()
           .append('path')
           .attr('d', projector)
           .attr('class', getPathName(key))
-          .style('fill', fill)
+          .style('fill', (d, i) => colorScale(i) || fill)
           .style('opacity', opacity);
       },
     };
   },
-  initOverlay('singapore_central'),
+  initOverlay('singapore'),
 );
 
 const initOverlay = key => (o = {}) => ({
@@ -178,8 +178,8 @@ Notice, we have the following:
 (found in `components/map_overlay_test/index.js`)
 
 ```
-const layer = d3.select('.mLayer');
-layer.select('.msvg').remove();
+const layer = d3.select(`.${layer_name}`);
+layer.select(`.${svg_name}`).remove();
 ```
 
 Where `.msvg` is my arbituary class name given to the overlay &lt;svg&gt; element we have.  
