@@ -38,7 +38,8 @@ const getPathName = key => d => (`path-${key}${(d && d.id && `-${d.id}`) || ''}`
 
 const colorScale = d3.scaleLinear()
       .domain([1, singapore_data.features.length])
-      .range(['#ff80de', '#101080']);
+      .interpolate(d3.interpolateHcl)
+      .range(['#ff8020', '#40ff00']);
 
 const getFillColor = (mapping => (key => mapping[key]))({
   triangle: '#ff0000',
@@ -129,6 +130,7 @@ const setSingapore = compose(
           .attr('d', projector)
           .attr('class', getPathName(key))
           .style('fill', (d, i) => colorScale(i) || fill)
+          .style('stroke', '#604000')
           .style('opacity', opacity);
       },
     };

@@ -1,5 +1,7 @@
+const baseUrl = process.env.NODE_ENV === 'production' ? '/minagawah/vue-google-map-sample/' : '/';
+
 module.exports = {
-  baseUrl: '/minagawah/vue-google-map-sample/',
+  baseUrl,
   configureWebpack: {
     module: {
       rules: [
