@@ -60,17 +60,17 @@ Like this:
 Notice also, as it receives `google` and `map` from the wrapper component,
 it is now *bypassing* these 2 props, this time, to two of the following child components:
 
-(1) `components/map_marker`
-(2) `components/map_overlay_test`
+Component 1: `components/map_marker`  
+Component 2: `components/map_overlay_test`
 
-#### (1) components/map_marker
+#### Component 1: "components/map_marker"
 
 For the former, iterates an array, called `markers`,
 each of which contains geo-coordinates for a certain marker,
 and is rendered into a marker on the map
 according to the rules defined in `components/map_marker`.
 
-*view/map/index.js:*
+view/map/index.js:
 
 ```
 const markers = [
@@ -84,7 +84,7 @@ const markers = [
 ];
 ```
 
-*components/map_marker/index.js:*
+components/map_marker/index.js:
 
 ```
 export default {
@@ -108,13 +108,13 @@ export default {
 };
 ```
 
-#### (2) components/map_overlay_test
+#### Component 2: "components/map_overlay_test"
 
 For the later, when `google` and `map` is given,
 adds a new Google Overlay View to the map,
 and projects a SVG rendered overlay of certain places:
 
-*components/map_overlay_test/index.js:*
+components/map_overlay_test/index.js:
 
 ```
 export default {
