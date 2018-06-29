@@ -47,7 +47,7 @@ we can automatically wait for whenever the map is ready.
 
 Let's take a closer look at `view/map` template again.  
 As the wrapper component is ready, it is now ready to export its 2 props: `google` and `map`  
-For which, `view/map` can receive, using &lt;slot-scope&gt;, these newly created props.  
+`view/map` uses &lt;slot-scope&gt; to destructure these newly created props for its own use.  
 Like this:
 
 ```
@@ -143,7 +143,7 @@ const setOverlay = (o = {}) => {
 ```
 
 
-### Tips + More
+### Tips
 
 #### (a) d3 v4 uses "stream"
 
