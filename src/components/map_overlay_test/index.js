@@ -53,9 +53,8 @@ const getOpacity = (mapping => (key => mapping[key]))({
 const projectorFactory = ({ google, projection, options }) => {
   const { padding = DEFAULT_PADDING_SIZE } = options || {};
   const point = function pointStream(lng, lat) {
-    const d = projection.fromLatLngToDivPixel(new google.maps.LatLng(lat, lng));
-    const { x = 0, y = 0 } = d || {};
-    this.stream.point(x + padding, y + padding);
+    const p = projection.fromLatLngToDivPixel(new google.maps.LatLng(lat, lng)) || {};
+    this.stream.point(p.x + padding, p.y + padding);
   };
   return d3.geoPath().projection(d3.geoTransform({ point }));
 };
@@ -72,8 +71,8 @@ const initOverlay = key => (o = {}) => ({
   },
 });
 
-const setOverlay = (o = {}) => {
-  const { google, map, layer_name, draw } = o;
+const setOverlay = (o) => {
+  const { google, map, layer_name, draw } = o || {};
   const overlay = new google.maps.OverlayView();
   overlay.setMap(map);
   overlay.onAdd = function onAdd() {
@@ -85,8 +84,8 @@ const setOverlay = (o = {}) => {
 
 const setTriangle = compose(
   setOverlay,
-  (o = {}) => {
-    const { google, key, layer_name, svg_name, group_name, fill, opacity } = o;
+  (o) => {
+    const { google, key, layer_name, svg_name, group_name, fill, opacity } = o || {};
     return {
       ...o,
       draw: function draw() {
@@ -112,8 +111,8 @@ const setTriangle = compose(
 
 const setSingapore = compose(
   setOverlay,
-  (o = {}) => {
-    const { google, key, layer_name, svg_name, group_name, fill, opacity } = o;
+  (o) => {
+    const { google, key, layer_name, svg_name, group_name, fill, opacity } = o || {};
     return {
       ...o,
       draw: function draw() {
