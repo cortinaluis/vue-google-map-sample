@@ -215,17 +215,15 @@ const projector = projectorFactory({ google, projection });
 
 #### (b) Delete SVG element upon every "draw"
 
-Notice, we have the following:  
-(found in `components/map_overlay/index.js`)
+I'm deleting the &lt;svg&gt; element everytime the overlay is updated,
+otherwise the overlay remains when we drag the map around.
+
+components/map_overlay/index.js:
 
 ```
 const layer = d3.select(`.${layer_name}`);
 layer.select(`.${svg_name}`).remove();
 ```
-
-Where `.msvg` is my arbituary class name given to the overlay &lt;svg&gt; element we have.  
-I'm deleting the &lt;svg&gt; element everytime the overlay is updated,
-because otherwise, the overlay remains when we drag the map around.
 
 
 #### (c) Weird Clipping on Overlay Layer
