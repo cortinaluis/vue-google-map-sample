@@ -50,7 +50,7 @@ and how we handle map related features using [d3](https://d3js.org/).
 For the features, I chose "Markers" and "Overlay Layers".
 However, before we go on discussing about this,
 let us first take a look at how we load Google Map.
-Here is how the template for `view/map` look like:
+This is how the template for `view/map` look like:
 
 view/map/template.html:
 
@@ -85,12 +85,13 @@ components/google_map_loader/template.html:
 `components/google_map_loader` is basically a wrapper for
 [google-maps-api-loader](https://github.com/laurencedorman/google-maps-api-loader),
 and the main job for this component is to load Google Map.
-Because we load `components/google_map_loader` as a Vue component,
-we don't need to worry anything about syncing the load,
-but it automatically wait for whenever our map is ready.
+Since we load `components/google_map_loader` as a Vue component,
+we don't worry too much about how we sync the load,
+but it automatically do the job for you,
+and tells you whenever our map is ready.
 
 Let's take a closer look at `view/map` template again.  
-As the wrapper component is ready, it is now ready to export its 2 props, namely, `google` and `map`.  
+When the wrapper component is ready, it is now ready to export its 2 props, namely, `google` and `map`.  
 For `view/map` uses &lt;slot-scope&gt;, it now receives these props by destructuring them.  
 Like this:
 
@@ -109,10 +110,10 @@ Component 2: `components/map_overlay`
 
 #### Component 1: "components/map_marker"
 
-For the former, iterates an array, called `markers`,
+For this component, `views/map` iterates an array called `markers`,
 each of which contains geo-coordinates for a certain marker,
-and is rendered into a marker on the map
-according to the rules defined in `components/map_marker`.
+and will be eventually rendered as a marker on the map
+according to the implementations defined in `components/map_marker`.
 
 view/map/index.js:
 
@@ -154,8 +155,8 @@ export default {
 
 #### Component 2: "components/map_overlay"
 
-For the later, when `google` and `map` is given,
-adds a new Google Overlay View to the map,
+For this, when `google` and `map` is given,
+adds a new Google Overlay layer to the map,
 and projects a SVG rendered overlay of certain places:
 
 components/map_overlay/index.js:
@@ -176,7 +177,9 @@ export default {
 };
 ```
 
-Bellow is just an example to illustrate how the d3 overlay is created:
+Bellow is one of the overlay definitions (among 2 defined)
+to show you how d3 SVG overlay is created:  
+(function definition order is altered for the ease of reading)
 
 ```
 const setSingapore = compose(
