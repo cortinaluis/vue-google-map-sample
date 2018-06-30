@@ -2,17 +2,46 @@
 
 vue-cli + Google Map + d3 (for SVG overlay example)
 
-[Demo](http://tokyo800.jp/minagawah/vue-google-map-sample/)
-
 ## 1. Overview
 
-### What I did
+This is a sample project to illustrate the use of Google Map
+on [vue-cli (v3.0)](https://github.com/vuejs/vue-cli) generated project.
+Specially, how to make an overlay layer on the map as [d3](https://d3js.org/) SVG.
+
+[Demo](http://tokyo800.jp/minagawah/vue-google-map-sample/)
+
+
+## 2. What I did
 
 1. Using [vue-cli (v3.0)](https://github.com/vuejs/vue-cli) to create a skeltal project.
 2. Setup Google Map using [google-maps-api-loader](https://github.com/laurencedorman/google-maps-api-loader).
 3. Using [d3 (v5)](https://d3js.org/) to plot an overlay layer as SVG.
 
-### More on What I actually did
+So, the project structure is fairly about the same
+compared to the original structure `vue-cli` initally generates.
+Except for `.eslintrc.js` and `vue.config`.
+
+I also renamed `*.vue` files, and instead,
+created separate "template.html", "style.styl", and "index.js" for each component,
+but this is no big deal, because it's something about how it appears,
+but they fundamentally work the same
+(some tips being discussed in [3-4. Importing Files](#import_files)).
+
+
+
+### 2-1. Installed Node Modules
+
+```
+npm install --save google-maps-api-loader
+npm install --save d3
+npm install --save ramda
+
+npm install --save-dev json-loader
+npm install --save-dev html-loader
+```
+
+
+### 2-2. Markers and Overlay Layers
 
 Here is how the template for `view/map` look like:
 
@@ -140,7 +169,7 @@ Bellow is just an example to illustrate how the d3 overlay is created:
 const setSingapore = compose(
   setOverlay,
   (o) => {
-    const { google, key, layer_name, svg_name, group_name, fill, opacity } = o || {};
+    const { google, key, layer_name, svg_name, group_name, path_name, stroke, fill, opacity } = o || {};
     return {
       ...o,
       draw: function draw() {
@@ -155,8 +184,9 @@ const setSingapore = compose(
           .enter()
           .append('path')
           .attr('d', projector)
-          .attr('class', getPathName(key))
-          .style('fill', (d, i) => colorScale(i) || fill)
+          .attr('class', path_name) // Function deteminines class name by "i" given.
+          .style('fill', fill) // Function using "colorScale" determines the color by "i" given.
+          .style('stroke', stroke)
           .style('opacity', opacity);
       },
     };
@@ -168,11 +198,13 @@ const initOverlay = key => (o = {}) => ({
   ...o,
   ...{
     key,
-    layer_name: getLayerName(key),
-    svg_name: getSvgName(key),
-    group_name: getGroupName(key),
-    fill: getFillColor(key),
-    opacity: getOpacity(key),
+    layer_name:  getLayerName(key),
+    svg_name:    getSvgName(key),
+    group_name:  getGroupName(key),
+    path_name:   getPathName(key),
+    fill:        getFillColor(key),
+    stroke:      getStrokeColor(key),
+    opacity:     getOpacity(key),
   },
 });
 
@@ -189,9 +221,9 @@ const setOverlay = (o) => {
 ```
 
 
-### Tips
+## 3. Tips & Others
 
-#### (a) d3 v4 uses "stream"
+### 3-1. Coordinates to "stream", to d3 PATH.
 
 [Since v4, d3 uses "stream" for all the map projection handlings](https://github.com/d3/d3-geo#streams).
 Hence, we need the following function (found in `components/map_overlay/index.js`)
@@ -215,7 +247,7 @@ const projection = this.getProjection();
 const projector = projectorFactory({ google, projection });
 ```
 
-#### (b) Delete SVG element upon every "draw"
+### 3-2. Delete SVG element upon every "draw"
 
 I'm deleting the &lt;svg&gt; element everytime the overlay is updated,
 otherwise the overlay remains when we drag the map around.
@@ -228,7 +260,7 @@ layer.select(`.${svg_name}`).remove();
 ```
 
 
-#### (c) Weird Clipping on Overlay Layer
+### 3-3. Weird Clipping on Overlay Layer
 
 Look at the bellow description in `components/map_overlay/style.styl`:
 
@@ -252,20 +284,8 @@ we set "top" and "left" back to the original position by adding 5000px.
 ```
 
 
-## 2. Notes
-
-### Installed Node Modules
-
-```
-npm install --save google-maps-api-loader
-npm install --save d3
-npm install --save ramda
-
-npm install --save-dev json-loader
-npm install --save-dev html-loader
-```
-
-### Importing Files
+<a name="import_files"></a>
+### 3-4. Importing Files
 
 #### *.geojson
 
@@ -323,3 +343,6 @@ module.exports = {
 Importing `*.styl` should work just fine without any changes on your build settings.
 
 
+## 4. License
+
+[LICENSE](./LICENSE)

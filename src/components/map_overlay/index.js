@@ -26,6 +26,11 @@ const triangle_data = [
   }
 ];
 
+const colorScale = d3.scaleLinear()
+      .domain([1, singapore_data.features.length])
+      .interpolate(d3.interpolateHcl)
+      .range(['#ff8020', '#40ff00']);
+
 // To prevent the weird overlay clipping when dragging the map around,
 // we intentionally shift "top" and "left" of the SVG element,
 // and later position them back to the original position.
@@ -34,16 +39,22 @@ const DEFAULT_PADDING_SIZE = 5000;
 const getLayerName = key => (key && `layer-${key}`) || 'mlayer';
 const getSvgName = key => (key && `svg-${key}`) || 'msvg';
 const getGroupName = key => (key && `group-${key}`) || 'mgroup';
+
+/**
+ * @returns {Function}
+ */
 const getPathName = key => d => (`path-${key}${(d && d.id && `-${d.id}`) || ''}`);
 
-const colorScale = d3.scaleLinear()
-      .domain([1, singapore_data.features.length])
-      .interpolate(d3.interpolateHcl)
-      .range(['#ff8020', '#40ff00']);
-
+/**
+ * @returns {string|Function}
+ */
 const getFillColor = (mapping => (key => mapping[key]))({
   triangle: '#ff0000',
-  singapore: '#009090',
+  singapore: (d, i) => colorScale(i),
+});
+
+const getStrokeColor = (mapping => (key => mapping[key]))({
+  singapore: '#604000',
 });
 
 const getOpacity = (mapping => (key => mapping[key]))({
@@ -67,7 +78,9 @@ const initOverlay = key => (o = {}) => ({
     layer_name:  getLayerName(key),
     svg_name:    getSvgName(key),
     group_name:  getGroupName(key),
+    path_name:   getPathName(key),
     fill:        getFillColor(key),
+    stroke:      getStrokeColor(key),
     opacity:     getOpacity(key),
   },
 });
@@ -86,7 +99,7 @@ const setOverlay = (o) => {
 const setTriangle = compose(
   setOverlay,
   (o) => {
-    const { google, key, layer_name, svg_name, group_name, fill, opacity } = o || {};
+    const { google, key, layer_name, svg_name, group_name, path_name, fill, opacity } = o || {};
     return {
       ...o,
       draw: function draw() {
@@ -101,7 +114,7 @@ const setTriangle = compose(
           .enter()
           .append('path')
           .attr('d', projector)
-          .attr('class', getPathName(key))
+          .attr('class', path_name) // Function deteminines class name by "i" given.
           .style('fill', fill)
           .style('opacity', opacity);
       },
@@ -113,7 +126,7 @@ const setTriangle = compose(
 const setSingapore = compose(
   setOverlay,
   (o) => {
-    const { google, key, layer_name, svg_name, group_name, fill, opacity } = o || {};
+    const { google, key, layer_name, svg_name, group_name, path_name, stroke, fill, opacity } = o || {};
     return {
       ...o,
       draw: function draw() {
@@ -128,9 +141,9 @@ const setSingapore = compose(
           .enter()
           .append('path')
           .attr('d', projector)
-          .attr('class', getPathName(key))
-          .style('fill', (d, i) => colorScale(i) || fill)
-          .style('stroke', '#604000')
+          .attr('class', path_name) // Function deteminines class name by "i" given.
+          .style('fill', fill) // Function using "colorScale" determines the color by "i" given.
+          .style('stroke', stroke)
           .style('opacity', opacity);
       },
     };
