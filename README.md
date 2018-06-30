@@ -19,8 +19,9 @@ Specially, how to make an overlay layer on the map as [d3](https://d3js.org/) SV
 
 So, the project structure is fairly about the same
 compared to the original structure
-[vue-cli (v3.0)](https://github.com/vuejs/vue-cli) initally generates.  
-Except for `.eslintrc.js` and `vue.config`.
+[vue-cli (v3.0)](https://github.com/vuejs/vue-cli) initally generates
+except for `vue.config` (for separate html loading)
+and `.eslintrc.js` (for custom ESLint rules).
 
 I also renamed `*.vue` files, and instead created
 an independent directory for each component,
@@ -42,14 +43,13 @@ npm install --save-dev html-loader
 ```
 
 
-### 2-2. Google Map related features & Vue Component Structure
+### 2-2. Google Map, related features, and Vue Components
 
 The main discussion here is to how we implement Google Map on Vue projects,
-and map related features using [d3 (v5)](https://d3js.org/).
-For this project, I chose "Markers" and "Overlay Layers".
-
-Before we discuss about these features,
-let me explain how our Google Map is loaded.
+and map related features using [d3](https://d3js.org/).
+For this project, I chose "Markers" and "Overlay Layers".  
+Before we go on discussing about these features,
+we need to discuss how we load Google Map at first.
 
 Here is the template for `view/map` look like:
 
