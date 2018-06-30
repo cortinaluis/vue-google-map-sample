@@ -6,7 +6,7 @@ vue-cli + Google Map + d3 (for SVG overlay example)
 
 This is a sample project to illustrate the use of Google Map
 on [vue-cli](https://github.com/vuejs/vue-cli) generated project.  
-Specially, how to make an overlay layer on the map as [d3](https://d3js.org/) SVG.
+Specifically, how to render an overlay layer as SVG using [d3](https://d3js.org/).
 
 [Demo](http://tokyo800.jp/minagawah/vue-google-map-sample/)
 
@@ -15,7 +15,7 @@ Specially, how to make an overlay layer on the map as [d3](https://d3js.org/) SV
 
 1. Using [vue-cli (v3.0)](https://github.com/vuejs/vue-cli) to create a skeltal project.
 2. Setup Google Map using [google-maps-api-loader](https://github.com/laurencedorman/google-maps-api-loader).
-3. Using [d3 (v5)](https://d3js.org/) to plot an overlay layer as SVG.
+3. Using [d3 (v5)](https://d3js.org/) to render overlay layers as SVG.
 
 So, the project structure is fairly about the same
 compared to the original structure
@@ -27,8 +27,8 @@ I also renamed `*.vue` files, and instead created
 an independent directory for each component,
 each of which stores `index.js`, `template.html`, and `style.styl`.
 But, this is no big deal because this is about how it appears
-when managing files, and they fundamentally work the same.  
-(some related tips are discussed in [3-4. Importing Files](#import_files))
+when managing files, and they fundamentally work the same
+(some related tips are discussed in [3-4. Importing Files](#import_files)).
 
 
 ### 2-1. Installed Node Modules
@@ -43,15 +43,17 @@ npm install --save-dev html-loader
 ```
 
 
-### 2-2. Google Map, related features, and Vue Components
+### 2-2. Google Map, Related Features, and Vue Components
 
 The main discussion here is to how we implement Google Map on Vue projects,
 and map related features using [d3](https://d3js.org/).
-For this project, I chose "Markers" and "Overlay Layers".  
-Before we go on discussing about these features,
-we need to discuss how we load Google Map at first.
+For this project, I chose "Markers" and "Overlay Layers".
+Before we go on discussing about this,
+we first see how we load the Google Map first.
 
 Here is the template for `view/map` look like:
+
+view/map/template.html:
 
 ```
 <div id="map">
@@ -67,8 +69,10 @@ Here is the template for `view/map` look like:
 </div>
 ```
 
-Notice, we have 2 templates for *slots* that are defined in `components/google_map_loader`.  
-Within `components/google_map_loader`, we have the corresponding slots:
+Notice, we have 2 templates for *slots*.  
+And, here are the corresponding slots:
+
+components/google_map_loader/template.html:
 
 ```
 <div id="google-map-loader">
@@ -79,10 +83,12 @@ Within `components/google_map_loader`, we have the corresponding slots:
 </div>
 ```
 
-The job for `components/google_map_loader` is to simply render a Google Map.
-It is basically a wrapper for [google-maps-api-loader](https://github.com/laurencedorman/google-maps-api-loader).
-By having `components/google_map_loader` as a separate component,
-we can automatically wait for whenever the map is ready.
+`components/google_map_loader` is basically a wrapper for
+[google-maps-api-loader](https://github.com/laurencedorman/google-maps-api-loader),
+and the main job for this component is to load Google Map.
+Because we load `components/google_map_loader` as a Vue component,
+we don't need to worry anything about syncing the load,
+but it automatically wait for whenever our map is ready.
 
 Let's take a closer look at `view/map` template again.  
 As the wrapper component is ready, it is now ready to export its 2 props, namely, `google` and `map`.  
@@ -177,7 +183,7 @@ Bellow is just an example to illustrate how the d3 overlay is created:
 const setSingapore = compose(
   setOverlay,
   (o) => {
-    const { google, key, layer_name, svg_name, group_name, path_name, stroke, fill, opacity } = o || {};
+    const { google, layer_name, svg_name, group_name, path_name, stroke, fill, opacity } = o || {};
     return {
       ...o,
       draw: function draw() {
