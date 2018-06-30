@@ -21,11 +21,12 @@ So, the project structure is fairly about the same
 compared to the original structure `vue-cli` initally generates.
 Except for `.eslintrc.js` and `vue.config`.
 
-I also renamed `*.vue` files, and instead,
-created separate "template.html", "style.styl", and "index.js" for each component,
-but this is no big deal, because it's something about how it appears,
-but they fundamentally work the same
-(some tips being discussed in [3-4. Importing Files](#import_files)).
+I also renamed `*.vue` files, and instead created
+an independent directory for each component
+each of which stores `index.js`, `template.html`, and `style.styl`.
+But, this is not a big deal because this is about how it appears
+when managing files, and they fundamentally work the same
+(some related tips are discussed in [3-4. Importing Files](#import_files)).
 
 
 
