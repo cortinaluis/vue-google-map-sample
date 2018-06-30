@@ -1,4 +1,5 @@
 /* eslint object-curly-newline: [0] */
+/* eslint max-len: [0] */
 import { compose } from 'ramda';
 import * as d3 from 'd3';
 
@@ -99,7 +100,7 @@ const setOverlay = (o) => {
 const setTriangle = compose(
   setOverlay,
   (o) => {
-    const { google, key, layer_name, svg_name, group_name, path_name, fill, opacity } = o || {};
+    const { google, layer_name, svg_name, group_name, path_name, fill, opacity } = o || {};
     return {
       ...o,
       draw: function draw() {
@@ -126,7 +127,8 @@ const setTriangle = compose(
 const setSingapore = compose(
   setOverlay,
   (o) => {
-    const { google, key, layer_name, svg_name, group_name, path_name, stroke, fill, opacity } = o || {};
+    const {
+      google, layer_name, svg_name, group_name, path_name, stroke, fill, opacity } = o || {};
     return {
       ...o,
       draw: function draw() {
