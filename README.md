@@ -46,11 +46,10 @@ npm install --save-dev html-loader
 ### 2-2. Google Map, Related Features, and Vue Components
 
 The main discussion here is to how we implement Google Map on Vue projects,
-and map related features using [d3](https://d3js.org/).
-For this project, I chose "Markers" and "Overlay Layers".
-Before we go on discussing about this,
-we first see how we load the Google Map first.
-
+and how we handle map related features using [d3](https://d3js.org/).
+For the features, I chose "Markers" and "Overlay Layers".
+However, before we go on discussing about this,
+let us first take a look at how we load Google Map.  
 Here is the template for `view/map` look like:
 
 view/map/template.html:
