@@ -24,7 +24,7 @@ Except for `.eslintrc.js` and `vue.config`.
 
 I also renamed `*.vue` files, and instead created
 an independent directory for each component,
-each of which stores `index.js`, `template.html`, and `style.styl`.  
+each of which stores `index.js`, `template.html`, and `style.styl`.
 But, this is no big deal because this is about how it appears
 when managing files, and they fundamentally work the same.  
 (some related tips are discussed in [3-4. Importing Files](#import_files))
@@ -42,12 +42,13 @@ npm install --save-dev html-loader
 ```
 
 
-### 2-2. Component Structures
+### 2-2. Google Map related features & Vue Component Structure
 
-The main discussion here is about how we implement Google Map on Vue projects,
-and how we handle related features using d3.  
-With this project, I chose **Markers** and **Overlay**.  
-But, before we discuss about these features,
+The main discussion here is to how we implement Google Map on Vue projects,
+and map related features using [d3 (v5)](https://d3js.org/).
+For this project, I chose "Markers" and "Overlay Layers".
+
+Before we discuss about these features,
 let me explain how our Google Map is loaded.
 
 Here is the template for `view/map` look like:
@@ -228,7 +229,7 @@ const setOverlay = (o) => {
 ```
 
 
-## 3. Tips
+## 3. Tips (on other issues)
 
 ### 3-1. Coordinates to "stream", to d3 PATH.
 
