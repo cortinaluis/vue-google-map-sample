@@ -5,7 +5,7 @@ vue-cli + Google Map + d3 (for SVG overlay example)
 ## 1. Overview
 
 This is a sample project to illustrate the use of Google Map
-on [vue-cli (v3.0)](https://github.com/vuejs/vue-cli) generated project.
+on [vue-cli](https://github.com/vuejs/vue-cli) generated project.  
 Specially, how to make an overlay layer on the map as [d3](https://d3js.org/) SVG.
 
 [Demo](http://tokyo800.jp/minagawah/vue-google-map-sample/)
@@ -18,16 +18,16 @@ Specially, how to make an overlay layer on the map as [d3](https://d3js.org/) SV
 3. Using [d3 (v5)](https://d3js.org/) to plot an overlay layer as SVG.
 
 So, the project structure is fairly about the same
-compared to the original structure `vue-cli` initally generates.
+compared to the original structure
+[vue-cli (v3.0)](https://github.com/vuejs/vue-cli) initally generates.  
 Except for `.eslintrc.js` and `vue.config`.
 
 I also renamed `*.vue` files, and instead created
-an independent directory for each component
-each of which stores `index.js`, `template.html`, and `style.styl`.
-But, this is not a big deal because this is about how it appears
-when managing files, and they fundamentally work the same
-(some related tips are discussed in [3-4. Importing Files](#import_files)).
-
+an independent directory for each component,
+each of which stores `index.js`, `template.html`, and `style.styl`.  
+But, this is no big deal because this is about how it appears
+when managing files, and they fundamentally work the same.  
+(some related tips are discussed in [3-4. Importing Files](#import_files))
 
 
 ### 2-1. Installed Node Modules
@@ -42,9 +42,15 @@ npm install --save-dev html-loader
 ```
 
 
-### 2-2. Markers and Overlay Layers
+### 2-2. Component Structures
 
-Here is how the template for `view/map` look like:
+The main discussion here is about how we implement Google Map on Vue projects,
+and how we handle related features using d3.  
+With this project, I chose **Markers** and **Overlay**.  
+But, before we discuss about these features,
+let me explain how our Google Map is loaded.
+
+Here is the template for `view/map` look like:
 
 ```
 <div id="map">
@@ -222,7 +228,7 @@ const setOverlay = (o) => {
 ```
 
 
-## 3. Tips & Others
+## 3. Tips
 
 ### 3-1. Coordinates to "stream", to d3 PATH.
 
