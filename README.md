@@ -49,8 +49,8 @@ The main discussion here is to how we implement Google Map on Vue projects,
 and how we handle map related features using [d3](https://d3js.org/).
 For the features, I chose "Markers" and "Overlay Layers".
 However, before we go on discussing about this,
-let us first take a look at how we load Google Map.  
-Here is the template for `view/map` look like:
+let us first take a look at how we load Google Map.
+Here is how the template for `view/map` look like:
 
 view/map/template.html:
 
@@ -68,8 +68,8 @@ view/map/template.html:
 </div>
 ```
 
-Notice, we have 2 templates for *slots*.  
-And, here are the corresponding slots:
+Notice, we have 2 templates for *slots*.
+Here are the corresponding slots for these templates:
 
 components/google_map_loader/template.html:
 
