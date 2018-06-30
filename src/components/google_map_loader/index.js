@@ -15,7 +15,7 @@ export default {
   data() {
     return {
       // These 2 will be passed down to "view/map" and then
-      // to "component/spot" as slot properties.
+      // to "component/marker" as slot properties.
       google: null,
       map: null,
     };

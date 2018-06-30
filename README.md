@@ -178,8 +178,10 @@ export default {
 ```
 
 Bellow is one of the overlay definitions (among 2 defined)
-to show you how d3 SVG overlay is created:  
-(function definition order is altered for the ease of reading)
+to show you how d3 SVG overlay is created:
+
+components/overlay_layer/index.js:  
+(altered the order of definitions for ease of reading)
 
 ```
 const setSingapore = compose(
@@ -234,6 +236,32 @@ const setOverlay = (o) => {
   };
   return o;
 };
+
+const getLayerName = key => (key && `layer-${key}`) || 'mlayer';
+const getSvgName = key => (key && `svg-${key}`) || 'msvg';
+const getGroupName = key => (key && `group-${key}`) || 'mgroup';
+
+/**
+ * @returns {Function}
+ */
+const getPathName = key => d => (`path-${key}${(d && d.id && `-${d.id}`) || ''}`);
+
+/**
+ * @returns {string|Function}
+ */
+const getFillColor = (mapping => (key => mapping[key]))({
+  triangle: '#ff0000',
+  singapore: (d, i) => colorScale(i),
+});
+
+const getStrokeColor = (mapping => (key => mapping[key]))({
+  singapore: '#604000',
+});
+
+const getOpacity = (mapping => (key => mapping[key]))({
+  triangle: 0.4,
+  singapore: 0.4,
+});
 ```
 
 
@@ -242,8 +270,9 @@ const setOverlay = (o) => {
 ### 3-1. Coordinates to "stream", to d3 PATH.
 
 [Since v4, d3 uses "stream" for all the map projection handlings](https://github.com/d3/d3-geo#streams).
-Hence, we need the following function (found in `components/map_overlay/index.js`)
-to convert (1) coodinates to a stream, and (2) stream to d3 path:
+Hence, we need the following function to convert (1) coodinates to a stream, and (2) stream to d3 path:
+
+components/map_overlay/index.js:
 
 ```
 const projectorFactory = ({ google, projection, options }) => {
