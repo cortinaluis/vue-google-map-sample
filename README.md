@@ -68,8 +68,8 @@ view/map/template.html:
 </div>
 ```
 
-Notice, we have 2 templates for *named slots* ("map-base" and "map-others").  
-Here are the corresponding slots for these templates:
+Notice, we have 2 templates for *named-slots* (*"map-base"* and *"map-others"*).  
+Here are the corresponding *named-slots* in `components/google_map_loader`:
 
 components/google_map_loader/template.html:
 
