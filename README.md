@@ -98,9 +98,10 @@ components/google_map_loader/template.html:
 </div>
 ```
 
-Let's take a closer look at `view/map` template again.  
-When the wrapper component is ready, it exports 2 props: `google` and `map`  
-Using &lt;slot-scope&gt; (by destructuring them), `view/map` can now receives these props.  
+Let's take a closer look at `view/map/template.html` again.  
+When `components/google_map_loader` is ready,
+it will export 2 props: `google` and `map`  
+For `view/map` uses &lt;slot-scope&gt; (with an object destructure) can now receives these props.  
 Like this:
 
 ```
