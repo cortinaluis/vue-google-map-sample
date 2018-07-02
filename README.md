@@ -71,13 +71,14 @@ view/map/template.html:
 For `components/google_map_loader` needs configurations in order to load Google Map,
 we are passing `mapElemId`, `apiKey`, and `config`.
 Where `isReady` isn't really necessary, but I'm passing this function
-for `components/google_map_loader` to call it upon the map instantiation,
+for `components/google_map_loader` to call it upon the map instantiation
 and `view/map` can tell when the map is ready (I have some map resizing job).
 
 OK. Here's the main dish for you.
-Notice that we have 2 templates defined above for named-slots, `map-base` and `map-others`,
-that are meant to fill the corresponding
-named-slots within in `components/google_map_loader`:
+Notice that we have 2 templates defined above for named-slots, `map-base` and `map-others`.
+These 2 templates are meant to fill the corresponding
+named-slots within in `components/google_map_loader`.  
+And, it looks like this:
 
 components/google_map_loader/template.html:
 
