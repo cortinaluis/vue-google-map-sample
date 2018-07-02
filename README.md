@@ -70,7 +70,7 @@ view/map/template.html:
 
 For `components/google_map_loader` needs configurations in order to load Google Map,
 we are passing `mapElemId`, `apiKey`, and `config`.
-`isReady` isn't really necessary, but I'm passing this function
+Where `isReady` isn't really necessary, but I'm passing this function
 for `components/google_map_loader` to call it upon the map instantiation,
 and `view/map` can tell when the map is ready (I have some map resizing job).
 
