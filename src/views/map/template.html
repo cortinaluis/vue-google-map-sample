@@ -1,5 +1,5 @@
 <div id="map">
-    <google-map-loader :map-elem-id="mapElemId" :api-key="apiKey" :config="config" :isReady="isReady">
+    <google-map-loader :map-elem-id="mapElemId" :api-key="apiKey" :config="config" :is-ready="isReady">
         <!-- "map" slot template will be deployed to <slot> in "components/google_map_loader". -->
         <template slot="map-base">
             <div v-bind:id="mapElemId" />
