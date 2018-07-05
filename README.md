@@ -194,10 +194,10 @@ components/overlay_layer/index.js:
 (altered the order of definitions for ease of reading)
 
 ```
-const setSingapore = compose(
+const setTriangle = compose(
   setOverlay,
   (o) => {
-    const { google, layer_name, svg_name, group_name, path_name, stroke, fill, opacity } = o || {};
+    const { google, layer_name, svg_name, group_name, path_name, fill, opacity } = o || {};
     return {
       ...o,
       draw: function draw() {
@@ -208,18 +208,17 @@ const setSingapore = compose(
         const svg = layer.append('svg').attr('class', svg_name);
         const g = svg.append('g').attr('class', group_name);
         g.selectAll('path')
-          .data(singapore_data.features)
+          .data(triangle_data)
           .enter()
           .append('path')
           .attr('d', projector)
           .attr('class', path_name) // Function deteminines class name by "i" given.
-          .style('fill', fill) // Function using "colorScale" determines the color by "i" given.
-          .style('stroke', stroke)
+          .style('fill', fill)
           .style('opacity', opacity);
       },
     };
   },
-  initOverlay('singapore'),
+  initOverlay('triangle'),
 );
 
 const initOverlay = key => (o = {}) => ({

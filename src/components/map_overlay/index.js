@@ -1,5 +1,6 @@
 /* eslint object-curly-newline: [0] */
 /* eslint max-len: [0] */
+/* eslint prefer-destructuring: [1] */
 import { compose } from 'ramda';
 import * as d3 from 'd3';
 
@@ -72,6 +73,25 @@ const projectorFactory = ({ google, projection, options }) => {
   return d3.geoPath().projection(d3.geoTransform({ point }));
 };
 
+const labelTranslateFactory = ({ google, projection, options }) => (d, i) => {
+  const { padding = DEFAULT_PADDING_SIZE } = options || {};
+  const { geometry: { coordinates } } = d || {};
+  let p = { x: 0, y: 0 };
+  if (coordinates) {
+    coordinates.forEach((coord, j) => {
+      if (j === i) {
+        const [arr] = coord;
+        if (arr) {
+          const [lng, lat] = d3.polygonCentroid(arr);
+          p = projection.fromLatLngToDivPixel(new google.maps.LatLng(lat, lng));
+        }
+      }
+    });
+  }
+  const { x = 0, y = 0 } = p;
+  return `translate(${x + padding},${y + padding})`;
+};
+
 const initOverlay = key => (o = {}) => ({
   ...o,
   ...{
@@ -91,7 +111,10 @@ const setOverlay = (o) => {
   const overlay = new google.maps.OverlayView();
   overlay.setMap(map);
   overlay.onAdd = function onAdd() {
-    d3.select(this.getPanes().overlayLayer).append('div').attr('class', layer_name);
+    d3.select(this.getPanes().overlayLayer)
+      .append('div')
+      .attr('class', layer_name)
+      .style('position', 'absolute');
     this.draw = draw;
   };
   return o;
@@ -134,6 +157,7 @@ const setSingapore = compose(
       draw: function draw() {
         const projection = this.getProjection();
         const projector = projectorFactory({ google, projection });
+        const labelTranslate = labelTranslateFactory({ google, projection });
         const layer = d3.select(`.${layer_name}`);
         layer.select(`.${svg_name}`).remove();
         const svg = layer.append('svg').attr('class', svg_name);
@@ -146,6 +170,18 @@ const setSingapore = compose(
           .attr('class', path_name) // Function deteminines class name by "i" given.
           .style('fill', fill) // Function using "colorScale" determines the color by "i" given.
           .style('stroke', stroke)
+          .style('opacity', opacity);
+
+        g.selectAll('.label')
+          .data(singapore_data.features)
+          .enter()
+          .append('text')
+          .text(d => d.properties.Name)
+          .attr('class', 'label')
+          .attr('transform', labelTranslate)
+          .attr('dy', () => '.35em')
+          .attr('fill', '#101010')
+          .style('text-anchor', 'middle')
           .style('opacity', opacity);
       },
     };
