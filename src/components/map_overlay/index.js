@@ -67,28 +67,40 @@ const getOpacity = (mapping => (key => mapping[key]))({
 const projectorFactory = ({ google, projection, options }) => {
   const { padding = DEFAULT_PADDING_SIZE } = options || {};
   const point = function pointStream(lng, lat) {
-    const p = projection.fromLatLngToDivPixel(new google.maps.LatLng(lat, lng)) || {};
-    this.stream.point(p.x + padding, p.y + padding);
+    const p = new google.maps.LatLng(lat, lng);
+    const { x = 0, y = 0 } = projection.fromLatLngToDivPixel(p) || {};
+    this.stream.point(x + padding, y + padding);
   };
   return d3.geoPath().projection(d3.geoTransform({ point }));
 };
 
+/**
+ * <pre>Say, i==2, then....
+ * {
+ *   geometry: {
+ *     coordinates: [
+ *       [[103.1111111, 1.2911111]],
+ *       [[103.2222222, 1.2922222]],
+ *       [[103.3333333, 1.2933333]], <--- This is it.
+ *       [[103.4444444, 1.2944444]]
+ *     ]
+ *   }
+ * }</pre>
+ */
 const labelTranslateFactory = ({ google, projection, options }) => (d, i) => {
   const { padding = DEFAULT_PADDING_SIZE } = options || {};
-  const { geometry: { coordinates } } = d || {};
-  let p = { x: 0, y: 0 };
-  if (coordinates) {
-    coordinates.forEach((coord, j) => {
-      if (j === i) {
-        const [arr] = coord;
-        if (arr) {
-          const [lng, lat] = d3.polygonCentroid(arr);
-          p = projection.fromLatLngToDivPixel(new google.maps.LatLng(lat, lng));
-        }
-      }
-    });
+  const { geometry: { coordinates = [] } } = d || {};
+  let x = 0;
+  let y = 0;
+  const area = coordinates[i];
+  if (area) {
+    const [coord] = area;
+    if (coord) {
+      const [lng, lat] = d3.polygonCentroid(coord);
+      const p = new google.maps.LatLng(lat, lng);
+      ({ x, y } = projection.fromLatLngToDivPixel(p));
+    }
   }
-  const { x = 0, y = 0 } = p;
   return `translate(${x + padding},${y + padding})`;
 };
 
@@ -123,7 +135,9 @@ const setOverlay = (o) => {
 const setTriangle = compose(
   setOverlay,
   (o) => {
-    const { google, layer_name, svg_name, group_name, path_name, fill, opacity } = o || {};
+    const {
+      google, layer_name, svg_name, group_name, path_name, fill, opacity,
+    } = o || {};
     return {
       ...o,
       draw: function draw() {
@@ -151,7 +165,8 @@ const setSingapore = compose(
   setOverlay,
   (o) => {
     const {
-      google, layer_name, svg_name, group_name, path_name, stroke, fill, opacity } = o || {};
+      google, layer_name, svg_name, group_name, path_name, stroke, fill, opacity,
+    } = o || {};
     return {
       ...o,
       draw: function draw() {

@@ -197,7 +197,9 @@ components/overlay_layer/index.js:
 const setTriangle = compose(
   setOverlay,
   (o) => {
-    const { google, layer_name, svg_name, group_name, path_name, fill, opacity } = o || {};
+    const {
+      google, layer_name, svg_name, group_name, path_name, fill, opacity,
+    } = o || {};
     return {
       ...o,
       draw: function draw() {
