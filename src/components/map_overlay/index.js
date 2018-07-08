@@ -67,39 +67,64 @@ const getOpacity = (mapping => (key => mapping[key]))({
 const projectorFactory = ({ google, projection, options }) => {
   const { padding = DEFAULT_PADDING_SIZE } = options || {};
   const point = function pointStream(lng, lat) {
-    const p = new google.maps.LatLng(lat, lng);
-    const { x = 0, y = 0 } = projection.fromLatLngToDivPixel(p) || {};
+    const pt = new google.maps.LatLng(lat, lng);
+    const { x = 0, y = 0 } = projection.fromLatLngToDivPixel(pt) || {};
     this.stream.point(x + padding, y + padding);
   };
   return d3.geoPath().projection(d3.geoTransform({ point }));
 };
 
 /**
- * <pre>Say, i==2, then....
- * {
- *   geometry: {
- *     coordinates: [
- *       [[103.1111111, 1.2911111]],
- *       [[103.2222222, 1.2922222]],
- *       [[103.3333333, 1.2933333]], <--- This is it.
- *       [[103.4444444, 1.2944444]]
- *     ]
- *   }
- * }</pre>
+ * To determine the label position for each, we need
+ * to find the center of each region.
+ * For each region is a "Multipolygon",
+ * "coordinates" is composed of multiple polygons,
+ * and we need to first find center of each polygon.
+ * So, we are creating a temporarry array called "arr"
+ * which is a set of center coodinates for each polygon.
+ * We will later find out the center from "arr"
+ * to obtain the actual center of the whole region.
  */
-const labelTranslateFactory = ({ google, projection, options }) => (d, i) => {
+const labelTranslateFactory = ({ google, projection, options }) => (d) => {
   const { padding = DEFAULT_PADDING_SIZE } = options || {};
   const { geometry: { coordinates = [] } } = d || {};
   let x = 0;
   let y = 0;
-  const area = coordinates[i];
-  if (area) {
-    const [coord] = area;
-    if (coord) {
-      const [lng, lat] = d3.polygonCentroid(coord);
-      const p = new google.maps.LatLng(lat, lng);
-      ({ x, y } = projection.fromLatLngToDivPixel(p));
+  // "coordinates" is multi-dimensional (for "Multipolygon"),
+  // and all of them as a whole represents one region.
+  const arr = coordinates.reduce((acc, outer) => {
+    // Weird it may be, each of them is an array within an array
+    // because that's the spec of "Multipolygon" says.
+    const [inner] = outer || [];
+    // Now, having: [lat, lng]
+    if (inner) {
+      // But, when getting the centroid, it becomes: [lng, lat]
+      const pt = d3.polygonCentroid(inner);
+      // So, needs the original order: [lng, lat] --> [lat, lng]
+      acc.push(pt.reverse());
     }
+    return acc;
+  }, []);
+  if (arr.length) {
+    let lat = 0;
+    let lng = 0;
+    if (arr.length === 1) {
+      // For a single "Point", just extract "lat" and "lng".
+      ([[lat = 0, lng = 0]] = arr);
+    } else if (arr.length === 2) {
+      // For a "Line", we find the halfway between.
+      // Notice, "d3.geoInterpolate" expects: [lng, lat]
+      // that's why we're reversing the order.
+      arr[0] = arr[0].reverse();
+      arr[1] = arr[1].reverse();
+      const interpolate = d3.geoInterpolate(arr[0], arr[1]);
+      ([lng = 0, lat = 0] = interpolate(0.5));
+    } else {
+      // For a "Polygon", it is simple.
+      ([lat = 0, lng = 0] = d3.polygonCentroid(arr));
+    }
+    const pt = new google.maps.LatLng(lat, lng);
+    ({ x, y } = projection.fromLatLngToDivPixel(pt));
   }
   return `translate(${x + padding},${y + padding})`;
 };
@@ -170,6 +195,7 @@ const setSingapore = compose(
     return {
       ...o,
       draw: function draw() {
+        console.log('+++++++ draw()');
         const projection = this.getProjection();
         const projector = projectorFactory({ google, projection });
         const labelTranslate = labelTranslateFactory({ google, projection });
