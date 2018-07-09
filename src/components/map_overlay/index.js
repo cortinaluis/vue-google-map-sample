@@ -33,9 +33,9 @@ const colorScale = d3.scaleLinear()
       .interpolate(d3.interpolateHcl)
       .range(['#ff8020', '#40ff00']);
 
-// To prevent the weird overlay clipping when dragging the map around,
-// we intentionally shift "top" and "left" of the SVG element,
-// and later position them back to the original position.
+// To prevent the weird overlay clipping while dragging the map around,
+// we intentionally shift "top" and "left" of the SVG element (in CSS),
+// and later position them back to the original position (in JS).
 const DEFAULT_PADDING_SIZE = 5000;
 
 const getLayerName = key => (key && `layer-${key}`) || 'mlayer';
@@ -64,68 +64,53 @@ const getOpacity = (mapping => (key => mapping[key]))({
   singapore: 0.4,
 });
 
+const label_opacity = 0.6;
+
+const latLngToPixelFactory = ({ google, projection }) => (lat, lng) => (
+  projection.fromLatLngToDivPixel(new google.maps.LatLng(lat, lng))
+);
+
 const projectorFactory = ({ google, projection, options }) => {
+  const latLngToPixel = latLngToPixelFactory({ google, projection });
   const { padding = DEFAULT_PADDING_SIZE } = options || {};
   const point = function pointStream(lng, lat) {
-    const pt = new google.maps.LatLng(lat, lng);
-    const { x = 0, y = 0 } = projection.fromLatLngToDivPixel(pt) || {};
+    // const p = new google.maps.LatLng(lat, lng);
+    // const { x = 0, y = 0 } = projection.fromLatLngToDivPixel(p) || {};
+    const { x = 0, y = 0 } = latLngToPixel(lat, lng);
     this.stream.point(x + padding, y + padding);
   };
   return d3.geoPath().projection(d3.geoTransform({ point }));
 };
 
 /**
- * To determine the label position for each, we need
- * to find the center of each region.
- * For each region is a "Multipolygon",
- * "coordinates" is composed of multiple polygons,
- * and we need to first find center of each polygon.
- * So, we are creating a temporarry array called "arr"
- * which is a set of center coodinates for each polygon.
- * We will later find out the center from "arr"
- * to obtain the actual center of the whole region.
+ * We cannot simply use "d3.polygonCentroid"
+ * to determine the center of the region because
+ * "Multipolygon" contains multiple polygons within.
+ * So, we iterate all the coordinates,
+ * to get the average of latitudes and longitudes.
  */
 const labelTranslateFactory = ({ google, projection, options }) => (d) => {
+  const latLngToPixel = latLngToPixelFactory({ google, projection });
   const { padding = DEFAULT_PADDING_SIZE } = options || {};
   const { geometry: { coordinates = [] } } = d || {};
-  let x = 0;
-  let y = 0;
-  // "coordinates" is multi-dimensional (for "Multipolygon"),
-  // and all of them as a whole represents one region.
-  const arr = coordinates.reduce((acc, outer) => {
-    // Weird it may be, each of them is an array within an array
-    // because that's the spec of "Multipolygon" says.
+  let total = 0;
+  const tmp = { lat: 0, lng: 0 };
+  coordinates.forEach((outer) => {
+    // Weird as it may seem, according to the specification,
+    // each array still contains another set of arrays within.
     const [inner] = outer || [];
-    // Now, having: [lat, lng]
     if (inner) {
-      // But, when getting the centroid, it becomes: [lng, lat]
-      const pt = d3.polygonCentroid(inner);
-      // So, needs the original order: [lng, lat] --> [lat, lng]
-      acc.push(pt.reverse());
+      inner.forEach(([lng = 0, lat = 0]) => {
+        tmp.lat += lat;
+        tmp.lng += lng;
+        total += 1;
+      });
     }
-    return acc;
-  }, []);
-  if (arr.length) {
-    let lat = 0;
-    let lng = 0;
-    if (arr.length === 1) {
-      // For a single "Point", just extract "lat" and "lng".
-      ([[lat = 0, lng = 0]] = arr);
-    } else if (arr.length === 2) {
-      // For a "Line", we find the halfway between.
-      // Notice, "d3.geoInterpolate" expects: [lng, lat]
-      // that's why we're reversing the order.
-      arr[0] = arr[0].reverse();
-      arr[1] = arr[1].reverse();
-      const interpolate = d3.geoInterpolate(arr[0], arr[1]);
-      ([lng = 0, lat = 0] = interpolate(0.5));
-    } else {
-      // For a "Polygon", it is simple.
-      ([lat = 0, lng = 0] = d3.polygonCentroid(arr));
-    }
-    const pt = new google.maps.LatLng(lat, lng);
-    ({ x, y } = projection.fromLatLngToDivPixel(pt));
-  }
+  });
+  const { x = 0, y = 0 } = latLngToPixel(
+    tmp.lat / total, // average of "lat"
+    tmp.lng / total // average of "lng"
+  );
   return `translate(${x + padding},${y + padding})`;
 };
 
@@ -195,6 +180,7 @@ const setSingapore = compose(
     return {
       ...o,
       draw: function draw() {
+        // mosaikekkan
         console.log('+++++++ draw()');
         const projection = this.getProjection();
         const projector = projectorFactory({ google, projection });
@@ -223,7 +209,7 @@ const setSingapore = compose(
           .attr('dy', () => '.35em')
           .attr('fill', '#101010')
           .style('text-anchor', 'middle')
-          .style('opacity', opacity);
+          .style('opacity', label_opacity);
       },
     };
   },

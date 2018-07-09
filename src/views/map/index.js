@@ -6,6 +6,8 @@ import MapOverlay from '@/components/map_overlay';
 import template from './template.html';
 import './style.styl';
 
+import map_styles from './map_styles.json';
+
 const mapElemId = 'my-google-map';
 const apiKey = 'AIzaSyDtDdWEh0tzu4bbIic4Sa68iPOgYbkF3h8';
 const center = { name: 'Raffles Hotel', lat: 1.2953139, lng: 103.8524867 };
@@ -29,7 +31,7 @@ export default {
       mapElemId,
       apiKey,
       markers,
-      config: { zoom, center },
+      config: { zoom, center, styles: map_styles },
     };
   },
   components: {
