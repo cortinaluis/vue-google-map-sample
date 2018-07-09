@@ -66,17 +66,11 @@ const getOpacity = (mapping => (key => mapping[key]))({
 
 const label_opacity = 0.6;
 
-const latLngToPixelFactory = ({ google, projection }) => (lat, lng) => (
-  projection.fromLatLngToDivPixel(new google.maps.LatLng(lat, lng))
-);
-
 const projectorFactory = ({ google, projection, options }) => {
-  const latLngToPixel = latLngToPixelFactory({ google, projection });
   const { padding = DEFAULT_PADDING_SIZE } = options || {};
   const point = function pointStream(lng, lat) {
-    // const p = new google.maps.LatLng(lat, lng);
-    // const { x = 0, y = 0 } = projection.fromLatLngToDivPixel(p) || {};
-    const { x = 0, y = 0 } = latLngToPixel(lat, lng);
+    const p = new google.maps.LatLng(lat, lng);
+    const { x = 0, y = 0 } = projection.fromLatLngToDivPixel(p) || {};
     this.stream.point(x + padding, y + padding);
   };
   return d3.geoPath().projection(d3.geoTransform({ point }));
@@ -90,7 +84,6 @@ const projectorFactory = ({ google, projection, options }) => {
  * to get the average of latitudes and longitudes.
  */
 const labelTranslateFactory = ({ google, projection, options }) => (d) => {
-  const latLngToPixel = latLngToPixelFactory({ google, projection });
   const { padding = DEFAULT_PADDING_SIZE } = options || {};
   const { geometry: { coordinates = [] } } = d || {};
   let total = 0;
@@ -107,10 +100,8 @@ const labelTranslateFactory = ({ google, projection, options }) => (d) => {
       });
     }
   });
-  const { x = 0, y = 0 } = latLngToPixel(
-    tmp.lat / total, // average of "lat"
-    tmp.lng / total // average of "lng"
-  );
+  const p = new google.maps.LatLng(tmp.lat / total, tmp.lng / total);
+  const { x = 0, y = 0 } = projection.fromLatLngToDivPixel(p) || {};
   return `translate(${x + padding},${y + padding})`;
 };
 
@@ -180,8 +171,6 @@ const setSingapore = compose(
     return {
       ...o,
       draw: function draw() {
-        // mosaikekkan
-        console.log('+++++++ draw()');
         const projection = this.getProjection();
         const projector = projectorFactory({ google, projection });
         const labelTranslate = labelTranslateFactory({ google, projection });
