@@ -14,6 +14,7 @@ module.exports = {
     "no-param-reassign": [2, { "props": false }],
     "function-paren-newline": [0],
     "key-spacing": [0],
+    "no-console": [0],
 
     "indent": [0, 2, { "MemberExpression": "off" }],
     // "vue/script-indent": [1, 2, { "baseIndent": 0, "MemberExpression": "off" }],

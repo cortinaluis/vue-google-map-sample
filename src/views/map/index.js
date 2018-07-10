@@ -11,7 +11,7 @@ import map_styles from './map_styles.json';
 const mapElemId = 'my-google-map';
 const apiKey = 'AIzaSyDtDdWEh0tzu4bbIic4Sa68iPOgYbkF3h8';
 const center = { name: 'Raffles Hotel', lat: 1.2953139, lng: 103.8524867 };
-const zoom = 10.5;
+const zoom = 10.75;
 
 const markers = [
   { name: 'Blu Jaz Cafe', lng: 103.8567434, lat: 1.3006284 },

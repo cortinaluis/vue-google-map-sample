@@ -41,11 +41,7 @@ const DEFAULT_PADDING_SIZE = 5000;
 const getLayerName = key => (key && `layer-${key}`) || 'mlayer';
 const getSvgName = key => (key && `svg-${key}`) || 'msvg';
 const getGroupName = key => (key && `group-${key}`) || 'mgroup';
-
-/**
- * @returns {Function}
- */
-const getPathName = key => d => (`path-${key}${(d && d.id && `-${d.id}`) || ''}`);
+const getPathName = key => d => (`path-${key}${(d && d.id && `-${d.id}`) || ''}`); // returns {Function}
 
 /**
  * @returns {string|Function}
@@ -64,8 +60,25 @@ const getOpacity = (mapping => (key => mapping[key]))({
   singapore: 0.4,
 });
 
-const label_opacity = 0.6;
+/**
+ * @returns {string|Function}
+ */
+const getLabelFillColor = (mapping => (key => mapping[key]))({
+  singapore: '#101010',
+});
 
+const getLabelOpacity = (mapping => (key => mapping[key]))({
+  singapore: 0.6,
+});
+
+// const label_opacity = 0.6;
+
+/**
+ * Provides a projector for path generation.
+ * It's a factory first requires "google" and "projection"
+ * to actually create the projector function.
+ * @returns {Function}
+ */
 const projectorFactory = ({ google, projection, options }) => {
   const { padding = DEFAULT_PADDING_SIZE } = options || {};
   const point = function pointStream(lng, lat) {
@@ -77,48 +90,67 @@ const projectorFactory = ({ google, projection, options }) => {
 };
 
 /**
+ * Provides a transformer syntax for label positions.
  * We cannot simply use "d3.polygonCentroid"
- * to determine the center of the region because
- * "Multipolygon" contains multiple polygons within.
- * So, we iterate all the coordinates,
- * to get the average of latitudes and longitudes.
+ * to determine the center of each region (in Singapore)
+ * because "Multipolygon" data contains multiple polygons.
+ * So, we iterate all the coordinates for each region to get
+ * the average of "lat" and "lng" as a pseudo centroid
+ * of the region. It is a functory function which
+ * first requires "google" and "projection".
+ * @returns {Function}
  */
 const labelTranslateFactory = ({ google, projection, options }) => (d) => {
   const { padding = DEFAULT_PADDING_SIZE } = options || {};
   const { geometry: { coordinates = [] } } = d || {};
   let total = 0;
-  const tmp = { lat: 0, lng: 0 };
+  let lat_sum = 0;
+  let lng_sum = 0;
   coordinates.forEach((outer) => {
     // Weird as it may seem, according to the specification,
     // each array still contains another set of arrays within.
     const [inner] = outer || [];
     if (inner) {
       inner.forEach(([lng = 0, lat = 0]) => {
-        tmp.lat += lat;
-        tmp.lng += lng;
+        lat_sum += lat;
+        lng_sum += lng;
         total += 1;
       });
     }
   });
-  const p = new google.maps.LatLng(tmp.lat / total, tmp.lng / total);
+  const p = new google.maps.LatLng(lat_sum / total, lng_sum / total);
   const { x = 0, y = 0 } = projection.fromLatLngToDivPixel(p) || {};
   return `translate(${x + padding},${y + padding})`;
 };
 
+/**
+ * Not really doing anything significant.
+ * Just prepares some class and ID names.
+ * Called before defining "draw" function.
+ * @returns {Function}
+ */
 const initOverlay = key => (o = {}) => ({
   ...o,
   ...{
     key,
-    layer_name:  getLayerName(key),
-    svg_name:    getSvgName(key),
-    group_name:  getGroupName(key),
-    path_name:   getPathName(key),
-    fill:        getFillColor(key),
-    stroke:      getStrokeColor(key),
-    opacity:     getOpacity(key),
+    layer_name:    getLayerName(key),
+    svg_name:      getSvgName(key),
+    group_name:    getGroupName(key),
+    path_name:     getPathName(key),
+    fill:          getFillColor(key),
+    stroke:        getStrokeColor(key),
+    opacity:       getOpacity(key),
+    label_fill:    getLabelFillColor(key),
+    label_opacity: getLabelOpacity(key),
   },
 });
 
+/**
+ * Once defined "draw" function, it then applies
+ * the defined "draw" function to "onAdd".
+ * Called after defining "draw" function.
+ * @returns {Object}
+ */
 const setOverlay = (o) => {
   const { google, map, layer_name, draw } = o || {};
   const overlay = new google.maps.OverlayView();
@@ -133,6 +165,17 @@ const setOverlay = (o) => {
   return o;
 };
 
+/**
+ * (1) "initOverlay", (2) defining "draw", (3) and "setOverlay".
+ * It basically defines "draw" function which will be applied
+ * to Google overlay view's "onAdd" (within "setOverlay").
+ * This is a simple demonstration of setting an overlay
+ * having only 3 spots on the map:
+ *   1. Singapore Botanic Gardens
+ *   2. Changi Airport Singapore
+ *   3. Raffles Hotel
+ * @returns {Function}
+ */
 const setTriangle = compose(
   setOverlay,
   (o) => {
@@ -142,10 +185,14 @@ const setTriangle = compose(
     return {
       ...o,
       draw: function draw() {
+        // Create a projector for the overlay path generation.
         const projection = this.getProjection();
         const projector = projectorFactory({ google, projection });
+        // Every time dragging the map around,
+        // removes SVG elements created previously.
         const layer = d3.select(`.${layer_name}`);
         layer.select(`.${svg_name}`).remove();
+        // Newly created SVG element to contain the overlay PATH.
         const svg = layer.append('svg').attr('class', svg_name);
         const g = svg.append('g').attr('class', group_name);
         g.selectAll('path')
@@ -162,24 +209,38 @@ const setTriangle = compose(
   initOverlay('triangle'),
 );
 
+/**
+ * (1) "initOverlay", (2) defining "draw", (3) and "setOverlay".
+ * It basically defines "draw" function which will be applied
+ * to Google overlay view's "onAdd" (within "setOverlay").
+ * Given an external GEOJSON data which represents regional boundaries
+ * of regions in Singapore, it creates overlay views for each region.
+ * Also, plots labels for regional names.
+ * @returns {Function}
+ */
 const setSingapore = compose(
   setOverlay,
   (o) => {
     const {
       google, layer_name, svg_name, group_name, path_name, stroke, fill, opacity,
+      label_fill, label_opacity,
     } = o || {};
+    const { features } = singapore_data || {};
     return {
       ...o,
       draw: function draw() {
+        // Create a projector for the overlay path generation.
         const projection = this.getProjection();
         const projector = projectorFactory({ google, projection });
-        const labelTranslate = labelTranslateFactory({ google, projection });
+        // Every time dragging the map around,
+        // removes SVG elements created previously.
         const layer = d3.select(`.${layer_name}`);
         layer.select(`.${svg_name}`).remove();
+        // Newly created SVG element to contain the overlay PATH.
         const svg = layer.append('svg').attr('class', svg_name);
         const g = svg.append('g').attr('class', group_name);
         g.selectAll('path')
-          .data(singapore_data.features)
+          .data(features)
           .enter()
           .append('path')
           .attr('d', projector)
@@ -188,6 +249,7 @@ const setSingapore = compose(
           .style('stroke', stroke)
           .style('opacity', opacity);
 
+        const labelTranslate = labelTranslateFactory({ google, projection });
         g.selectAll('.label')
           .data(singapore_data.features)
           .enter()
@@ -196,9 +258,9 @@ const setSingapore = compose(
           .attr('class', 'label')
           .attr('transform', labelTranslate)
           .attr('dy', () => '.35em')
-          .attr('fill', '#101010')
-          .style('text-anchor', 'middle')
-          .style('opacity', label_opacity);
+          .attr('fill', label_fill)
+          .style('opacity', label_opacity)
+          .style('text-anchor', 'middle');
       },
     };
   },

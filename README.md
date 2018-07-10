@@ -227,13 +227,15 @@ const initOverlay = key => (o = {}) => ({
   ...o,
   ...{
     key,
-    layer_name:  getLayerName(key),
-    svg_name:    getSvgName(key),
-    group_name:  getGroupName(key),
-    path_name:   getPathName(key),
-    fill:        getFillColor(key),
-    stroke:      getStrokeColor(key),
-    opacity:     getOpacity(key),
+    layer_name:    getLayerName(key),
+    svg_name:      getSvgName(key),
+    group_name:    getGroupName(key),
+    path_name:     getPathName(key),
+    fill:          getFillColor(key),
+    stroke:        getStrokeColor(key),
+    opacity:       getOpacity(key),
+    label_fill:    getLabelFillColor(key),
+    label_opacity: getLabelOpacity(key),
   },
 });
 
@@ -242,7 +244,10 @@ const setOverlay = (o) => {
   const overlay = new google.maps.OverlayView();
   overlay.setMap(map);
   overlay.onAdd = function onAdd() {
-    d3.select(this.getPanes().overlayLayer).append('div').attr('class', layer_name);
+    d3.select(this.getPanes().overlayLayer)
+      .append('div')
+      .attr('class', layer_name)
+      .style('position', 'absolute');
     this.draw = draw;
   };
   return o;
@@ -251,15 +256,8 @@ const setOverlay = (o) => {
 const getLayerName = key => (key && `layer-${key}`) || 'mlayer';
 const getSvgName = key => (key && `svg-${key}`) || 'msvg';
 const getGroupName = key => (key && `group-${key}`) || 'mgroup';
-
-/**
- * @returns {Function}
- */
 const getPathName = key => d => (`path-${key}${(d && d.id && `-${d.id}`) || ''}`);
 
-/**
- * @returns {string|Function}
- */
 const getFillColor = (mapping => (key => mapping[key]))({
   triangle: '#ff0000',
   singapore: (d, i) => colorScale(i),
@@ -273,6 +271,15 @@ const getOpacity = (mapping => (key => mapping[key]))({
   triangle: 0.4,
   singapore: 0.4,
 });
+
+const getLabelFillColor = (mapping => (key => mapping[key]))({
+  singapore: '#101010',
+});
+
+const getLabelOpacity = (mapping => (key => mapping[key]))({
+  singapore: 0.6,
+});
+
 ```
 
 
@@ -289,8 +296,9 @@ components/map_overlay/index.js:
 const projectorFactory = ({ google, projection, options }) => {
   const { padding = DEFAULT_PADDING_SIZE } = options || {};
   const point = function pointStream(lng, lat) {
-    const p = projection.fromLatLngToDivPixel(new google.maps.LatLng(lat, lng)) || {};
-    this.stream.point(p.x + padding, p.y + padding);
+    const p = new google.maps.LatLng(lat, lng);
+    const { x = 0, y = 0 } = projection.fromLatLngToDivPixel(p) || {};
+    this.stream.point(x + padding, y + padding);
   };
   return d3.geoPath().projection(d3.geoTransform({ point }));
 };
