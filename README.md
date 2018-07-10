@@ -8,7 +8,7 @@ This is a sample project to illustrate the use of Google Map
 on [vue-cli](https://github.com/vuejs/vue-cli) generated project.  
 Specifically, how to render an overlay layer as SVG using [d3](https://d3js.org/).
 
-[Demo](http://tokyo800.jp/minagawah/vue-google-map-sample/)
+[Demo](http://tokyo800.jp/minagawah/vue-google-map-sample/#/map)
 
 
 ## 2. What I did
