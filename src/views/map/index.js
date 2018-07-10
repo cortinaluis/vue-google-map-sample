@@ -2,6 +2,7 @@
 import GoogleMapLoader from '@/components/google_map_loader';
 import MapMarker from '@/components/map_marker';
 import MapOverlay from '@/components/map_overlay';
+import MapOverlayWithoutD3 from '@/components/map_overlay_without_d3';
 
 import template from './template.html';
 import './style.styl';
@@ -38,6 +39,7 @@ export default {
     GoogleMapLoader,
     MapMarker,
     MapOverlay,
+    MapOverlayWithoutD3,
   },
   methods: {
     isReady() {

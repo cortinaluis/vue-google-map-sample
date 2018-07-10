@@ -12,6 +12,7 @@
         -->
         <template slot="map-others" slot-scope="{ google, map }">
             <map-marker v-for="(marker,i) in markers" :key="i" :google="google" :map="map" :marker="marker" />
+            <map-overlay-without-d3 :google="google" :map="map" />
             <map-overlay :google="google" :map="map" />
         </template>
     </google-map-loader>

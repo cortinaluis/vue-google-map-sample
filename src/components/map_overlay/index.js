@@ -1,6 +1,10 @@
 /* eslint object-curly-newline: [0] */
 /* eslint max-len: [0] */
 /* eslint prefer-destructuring: [1] */
+/**
+ * Adds a red triangle overlay to Google map using d3.
+ * Adds a Singaple regional overlay to Google map using d3.
+ */
 import { compose } from 'ramda';
 import * as d3 from 'd3';
 
@@ -70,8 +74,6 @@ const getLabelFillColor = (mapping => (key => mapping[key]))({
 const getLabelOpacity = (mapping => (key => mapping[key]))({
   singapore: 0.6,
 });
-
-// const label_opacity = 0.6;
 
 /**
  * Provides a projector for path generation.

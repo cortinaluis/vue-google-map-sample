@@ -1,0 +1,17 @@
+{
+  "type": "Feature",
+  "properties": {
+    "name": "Botanic Gardens, Singapore Zoo, and Punggol Park"
+  },
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [103.8137249, 1.3138451],
+        [103.7908343, 1.4043539],
+        [103.8955356, 1.377199],
+        [103.8137249, 1.3138451]
+      ]
+    ]
+  }
+}
