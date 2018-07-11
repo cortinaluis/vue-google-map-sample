@@ -2,8 +2,8 @@
 /* eslint max-len: [0] */
 /* eslint prefer-destructuring: [1] */
 /**
- * Adds a red triangle overlay to Google map using d3.
- * Adds a Singaple regional overlay to Google map using d3.
+ * Adding a simple red triangle overlay to Google map using d3.
+ * Adding a Singaple regional overlay to Google map using d3.
  */
 import { compose } from 'ramda';
 import * as d3 from 'd3';
@@ -39,7 +39,7 @@ const colorScale = d3.scaleLinear()
 
 // To prevent the weird overlay clipping while dragging the map around,
 // we intentionally shift "top" and "left" of the SVG element (in CSS),
-// and later position them back to the original position (in JS).
+// and later set them back to the original position (in JS).
 const DEFAULT_PADDING_SIZE = 5000;
 
 const getLayerName = key => (key && `layer-${key}`) || 'mlayer';
@@ -77,8 +77,9 @@ const getLabelOpacity = (mapping => (key => mapping[key]))({
 
 /**
  * Provides a projector for path generation.
- * It's a factory first requires "google" and "projection"
- * to actually create the projector function.
+ * For it's a factory function, you need to first
+ * give "google" and "projection" for this function
+ * to provide us the function we actually use.
  * @returns {Function}
  */
 const projectorFactory = ({ google, projection, options }) => {
@@ -92,14 +93,16 @@ const projectorFactory = ({ google, projection, options }) => {
 };
 
 /**
- * Provides a transformer syntax for label positions.
- * We cannot simply use "d3.polygonCentroid"
- * to determine the center of each region (in Singapore)
- * because "Multipolygon" data contains multiple polygons.
- * So, we iterate all the coordinates for each region to get
- * the average of "lat" and "lng" as a pseudo centroid
- * of the region. It is a functory function which
- * first requires "google" and "projection".
+ * Provides a transformer (translate) for label positions.
+ * Using "d3.polygonCentroid" does not solve the problem
+ * because our geojson is expressed in "Multipolygon".
+ * Meaning, we must iterate for all the coordinates
+ * (each of which is a polygon) to calculate the average
+ * for "lat" and "lng" contained,  so that we can use
+ * this average as a pseudo centroid for each region.
+ * For it's a factory function, you need to first
+ * give "google" and "projection" for this function
+ * to provide us the function we actually use.
  * @returns {Function}
  */
 const labelTranslateFactory = ({ google, projection, options }) => (d) => {
@@ -128,7 +131,7 @@ const labelTranslateFactory = ({ google, projection, options }) => (d) => {
 /**
  * Not really doing anything significant.
  * Just prepares some class and ID names.
- * Called before defining "draw" function.
+ * Called before defining "draw".
  * @returns {Function}
  */
 const initOverlay = key => (o = {}) => ({
@@ -148,8 +151,7 @@ const initOverlay = key => (o = {}) => ({
 });
 
 /**
- * Once defined "draw" function, it then applies
- * the defined "draw" function to "onAdd".
+ * Once "draw" is defined, then it applies "draw" to "onAdd".
  * Called after defining "draw" function.
  * @returns {Object}
  */
@@ -169,8 +171,8 @@ const setOverlay = (o) => {
 
 /**
  * (1) "initOverlay", (2) defining "draw", (3) and "setOverlay".
- * It basically defines "draw" function which will be applied
- * to Google overlay view's "onAdd" (within "setOverlay").
+ * It basically defines "draw" which will be later
+ * set to Google overlay's "onAdd".
  * This is a simple demonstration of setting an overlay
  * having only 3 spots on the map:
  *   1. Singapore Botanic Gardens
@@ -213,8 +215,8 @@ const setTriangle = compose(
 
 /**
  * (1) "initOverlay", (2) defining "draw", (3) and "setOverlay".
- * It basically defines "draw" function which will be applied
- * to Google overlay view's "onAdd" (within "setOverlay").
+ * It basically defines "draw" which will be later
+ * set to Google overlay's "onAdd".
  * Given an external GEOJSON data which represents regional boundaries
  * of regions in Singapore, it creates overlay views for each region.
  * Also, plots labels for regional names.

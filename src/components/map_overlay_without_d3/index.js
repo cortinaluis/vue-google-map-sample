@@ -1,5 +1,5 @@
 /**
- * Adds a green triangle overlay to Google map without using d3.
+ * Adding a simple green triangle overlay to Google map without using d3.
  */
 import template from './template.html';
 
