@@ -122,7 +122,7 @@ it is now *bypassing* these 2 props, this time, to 4 of the following components
 
 Component 1: `components/map_marker`  
 Component 2: `components/map_marker_without_d3`  
-Component 3: `components/map_overlay`
+Component 3: `components/map_overlay`  
 Component 4: `components/map_overlay_without_d3`
 
 #### Component 1: "components/map_marker"
