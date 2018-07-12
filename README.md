@@ -61,7 +61,10 @@ view/map/template.html:
             <div v-bind:id="mapElemId" />
         </template>
         <template slot="map-others" slot-scope="{ google, map }">
-            <map-marker v-for="(marker,i) in markers" :key="i" :google="google" :map="map" :marker="marker" />
+            <map-marker-without-d3
+                v-for="(marker,i) in markers" :key="i"
+                :google="google" :map="map" :marker="marker" />
+            <map-overlay-without-d3 :google="google" :map="map" />
             <map-overlay :google="google" :map="map" />
         </template>
     </google-map-loader>
@@ -113,33 +116,30 @@ Like this:
 ```
 
 Notice also, as it receives `google` and `map` from the wrapper component,
-it is now *bypassing* these 2 props, this time, to two of the following child components:
+it is now *bypassing* these 2 props, this time, to 3 of the following child components:
 
-Component 1: `components/map_marker`  
-Component 2: `components/map_overlay`
+Component 1: `components/map_marker_without_d3`  
+Component 2: `components/map_overlay_without_d3`
+Component 3: `components/map_overlay`
 
-#### Component 1: "components/map_marker"
+#### Component 1: "components/map_marker_without_d3"
 
 For this component, `views/map` iterates an array called `markers`,
 each of which contains geo-coordinates for a certain marker,
 and will be eventually rendered as a marker on the map
-according to the implementations defined in `components/map_marker`.
+according to the implementations defined in `components/map_marker_without_d3`.
 
 view/map/index.js:
 
 ```
 const markers = [
-  { name: 'Blu Jaz Cafe', lng: 103.8567434, lat: 1.3006284 },
-  { name: 'Candour Coffee', lng: 103.8557405, lat: 1.2960791 },
-  { name: 'Bugis MRT', lng: 103.8534648, lat: 1.3008724 },
-  { name: 'Book Point', lng: 103.8525092, lat: 1.2969103 },
   { name: 'Raffles Hotel', lng: 103.8522904, lat: 1.2948883 },
   { name: 'Singapore Botanic Gardens', lng: 103.8137249, lat: 1.3138451 },
   { name: 'Changi Airport Singapore', lng: 103.9893421, lat: 1.3644256 },
 ];
 ```
 
-components/map_marker/index.js:
+components/map_marker_without_d3/index.js:
 
 ```
 export default {
@@ -163,7 +163,30 @@ export default {
 };
 ```
 
-#### Component 2: "components/map_overlay"
+#### Component 2: "components/map_overlay_without_d3"
+
+For this, when `google` and `map` is given,
+adds a new Google Overlay layer to the map.
+
+components/map_overlay_without_d3/index.js:
+
+```
+export default {
+  name: 'map-marker-without-d3',
+  template,
+  props: {
+    google: Object, // Provided by "components/google_map_loader".
+    map: Object, // Provided by "components/google_map_loader".
+  },
+  mounted() {
+    const { google, map } = this;
+    setTriangle({ google, map });
+    setSingapore({ google, map });
+  },
+};
+```
+
+#### Component 3: "components/map_overlay"
 
 For this, when `google` and `map` is given,
 adds a new Google Overlay layer to the map,
