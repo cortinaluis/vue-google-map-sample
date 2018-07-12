@@ -8,17 +8,12 @@
              The "others" slot will be deployed to <slot> in "components/google_map_loader".
              Notice how "components/google_map_loader" provides "google" and "map".
              Here, we simply destructure them for our own use.
-             Notice, also, we are passing "marker" to "components/marker".
-             (the same for "components/marker_without_d3")
+             Notice, also, we are passing "marker" to "components/map_markers".
+             (the same for "components/map_markers_without_d3")
         -->
         <template slot="map-others" slot-scope="{ google, map }">
             <map-markers :google="google" :map="map" :markers="markers" />
-            <!-- <map-marker
-                 v-for="(marker,i) in markers" :key="i"
-                 :google="google" :map="map" :marker="marker" />
-                 <map-marker-without-d3
-                 v-for="(marker,i) in markers_without_d3" :key="`${i}-without-d3`"
-                 :google="google" :map="map" :marker="marker" /> -->
+            <map-markers-without-d3 :google="google" :map="map" :markers="markers_without_d3" />
             <map-overlay :google="google" :map="map" />
             <map-overlay-without-d3 :google="google" :map="map" />
         </template>

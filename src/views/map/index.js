@@ -1,9 +1,8 @@
 /* eslint no-unused-vars: [1] */
 import GoogleMapLoader from '@/components/google_map_loader';
 import MapMarkers from '@/components/map_markers';
-// import MapMarker from '@/components/map_marker';
-// import MapMarkerWithoutD3 from '@/components/map_marker_without_d3';
 import MapOverlay from '@/components/map_overlay';
+import MapMarkersWithoutD3 from '@/components/map_markers_without_d3';
 import MapOverlayWithoutD3 from '@/components/map_overlay_without_d3';
 
 import template from './template.html';
@@ -46,9 +45,8 @@ export default {
   components: {
     GoogleMapLoader,
     MapMarkers,
-    // MapMarker,
     MapOverlay,
-    // MapMarkerWithoutD3,
+    MapMarkersWithoutD3,
     MapOverlayWithoutD3,
   },
   methods: {

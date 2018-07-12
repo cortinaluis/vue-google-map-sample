@@ -61,11 +61,10 @@ view/map/template.html:
             <div v-bind:id="mapElemId" />
         </template>
         <template slot="map-others" slot-scope="{ google, map }">
-            <map-marker-without-d3
-                v-for="(marker,i) in markers" :key="i"
-                :google="google" :map="map" :marker="marker" />
-            <map-overlay-without-d3 :google="google" :map="map" />
+            <map-markers :google="google" :map="map" :markers="markers" />
+            <map-markers-without-d3 :google="google" :map="map" :markers="markers_without_d3" />
             <map-overlay :google="google" :map="map" />
+            <map-overlay-without-d3 :google="google" :map="map" />
         </template>
     </google-map-loader>
 </div>
@@ -75,15 +74,16 @@ So, we are loading `components/google_map_loader` here.
 Well, `components/google_map_loader` is basically just a wrapper for
 [google-maps-api-loader](https://github.com/laurencedorman/google-maps-api-loader),
 and loading Google Map is the only job it's got.
-As we load `components/google_map_loader` as a Vue component,
-we don't need to worry about how to sync the load,
-but it automatically do the job for you.
+When we load `components/google_map_loader` as a Vue component,
+we really don't have to bother much about how we sync the load,
+but Vue will automatically do the job for you.
 
-For `components/google_map_loader` needs configurations in order to load Google Map,
+For `components/google_map_loader` needs configurations as it loads Google Map,
 we pass `mapElemId`, `apiKey`, and `config`.
-Where `isReady` isn't really necessary, but I'm passing this function
-for `components/google_map_loader` to call it upon the map instantiation
-and `view/map` can tell when the map is ready (I have some map resizing job).
+Where `isReady` isn't really necessary, but I thought it would be useful.  
+Currently, I am passing `isReady` for `components/google_map_loader`  
+to call it upon the map instantiation as `view/map` can figure out  
+the map is ready (I have some map resizing job).
 
 Notice also, that we have 2 templates defined above for named-slots, `map-base` and `map-others`.
 These 2 templates are meant to fill the corresponding
@@ -109,25 +109,27 @@ can now receives these props.
 Like this:
 
 ```
-        <template slot-scope="{ google, map }">
-            <map-marker v-for="(marker,i) in markers" :key="i" :google="google" :map="map" :marker="marker" />
+        <template slot="map-others" slot-scope="{ google, map }">
+            <map-markers :google="google" :map="map" :markers="markers" />
+            <map-markers-without-d3 :google="google" :map="map" :markers="markers_without_d3" />
             <map-overlay :google="google" :map="map" />
+            <map-overlay-without-d3 :google="google" :map="map" />
         </template>
 ```
 
 Notice also, as it receives `google` and `map` from the wrapper component,
-it is now *bypassing* these 2 props, this time, to 3 of the following child components:
+it is now *bypassing* these 2 props, this time, to 4 of the following components:
 
-Component 1: `components/map_marker_without_d3`  
-Component 2: `components/map_overlay_without_d3`
+Component 1: `components/map_marker`  
+Component 2: `components/map_marker_without_d3`  
 Component 3: `components/map_overlay`
+Component 4: `components/map_overlay_without_d3`
 
-#### Component 1: "components/map_marker_without_d3"
+#### Component 1: "components/map_marker"
 
-For this component, `views/map` iterates an array called `markers`,
-each of which contains geo-coordinates for a certain marker,
-and will be eventually rendered as a marker on the map
-according to the implementations defined in `components/map_marker_without_d3`.
+When `google` and `map` is given, it adds a new Google Overlay layer to the map,
+and projects a SVG rendered overlay,
+for which we plots all the markers given as `markers`:
 
 view/map/index.js:
 
@@ -139,58 +141,170 @@ const markers = [
 ];
 ```
 
-components/map_marker_without_d3/index.js:
+components/map_markers/index.js:
 
 ```
 export default {
-  name: 'map-marker',
+  name: 'map-markers',
   template,
   props: {
     google: Object, // Provided by "components/google_map_loader".
     map: Object, // Provided by "components/google_map_loader".
-    marker: Object, // Given directly from "views/map".
+    markers: Array, // Given directly from "views/map".
   },
   data() {
-    return { spot: null };
+    return {};
   },
   mounted() {
-    const { map } = this;
-    const { Marker } = this.google.maps;
-    const { name: title, lat, lng } = this.marker || {};
-    const position = { lat, lng };
-    this.spot = new Marker({ title, map, position });
+    const { google, map, markers } = this;
+    setMarkers({ google, map, markers });
   },
 };
 ```
 
-#### Component 2: "components/map_overlay_without_d3"
+Just in case you wonder what `setMarkers` does,
+here's the definition
+(along with some related functions,
+but changed the order for the ease of read):
 
-For this, when `google` and `map` is given,
-adds a new Google Overlay layer to the map.
+components/map_markers/index.js:  
 
-components/map_overlay_without_d3/index.js:
+```
+const setMarkers = compose(
+  setOverlay,
+  (o) => {
+    const {
+      google, markers, layer_name, svg_name, group_name, group_name_circle,
+      radius, fill, opacity, label_fill, label_opacity,
+    } = o || {};
+    return {
+      ...o,
+      draw: function draw() {
+        // Create a projector for the overlay path generation.
+        const projection = this.getProjection();
+        const translate = translateFactory({ google, projection });
+        // Every time dragging the map around,
+        // removes SVG elements created previously.
+        const layer = d3.select(`.${layer_name}`);
+        layer.select(`.${svg_name}`).remove();
+        // Newly created SVG element to contain the overlay PATH.
+        const svg = layer.append('svg').attr('class', svg_name);
+        const g = svg.append('g').attr('class', group_name);
+        g.selectAll('path')
+          .data(markers)
+          .enter()
+          .append('g')
+          .attr('transform', translate)
+          .attr('class', group_name_circle) // Function deteminines class name by "i" given.
+          .append('circle')
+          .attr('r', radius)
+          .style('fill', fill)
+          .style('opacity', opacity);
+
+        g.selectAll('.label')
+          .data(markers)
+          .enter()
+          .append('text')
+          .text(d => d.name)
+          .attr('class', 'label')
+          .attr('transform', translate)
+          .attr('dy', () => '-.5em')
+          .attr('fill', label_fill)
+          .style('opacity', label_opacity)
+          .style('text-anchor', 'middle');
+      },
+    };
+  },
+  initOverlay,
+);
+
+const initOverlay = (o = {}) => ({
+  ...o,
+  ...{
+    layer_name:        getLayerName(),
+    svg_name:          getSvgName(),
+    group_name:        getGroupName(),
+    group_name_circle: getGroupNameCircle(),
+    radius:            getRadius(),
+    fill:              getFillColor(),
+    opacity:           getOpacity(),
+    label_fill:        getLabelFillColor(),
+    label_opacity:     getLabelOpacity(),
+  },
+});
+
+const setOverlay = (o) => {
+  const { google, map, layer_name, draw } = o || {};
+  const overlay = new google.maps.OverlayView();
+  overlay.setMap(map);
+  overlay.onAdd = function onAdd() {
+    d3.select(this.getPanes().overlayLayer)
+      .append('div')
+      .attr('class', layer_name)
+      .style('position', 'absolute');
+    this.draw = draw;
+  };
+  return o;
+};
+
+const translateFactory = ({ google, projection, options }) => (d) => {
+  const { padding = DEFAULT_PADDING_SIZE } = options || {};
+  const { lat = 0, lng = 0 } = d || {};
+  const p = new google.maps.LatLng(lat, lng);
+  const { x = 0, y = 0 } = projection.fromLatLngToDivPixel(p) || {};
+  return `translate(${x + padding},${y + padding})`;
+};
+```
+
+#### Component 2: "components/map_markers_without_d3"
+
+This is a demonstration just to show you that you can plot markers without using d3.
+
+view/map/index.js:
+
+```
+const markers_without_d3 = [
+  { name: 'Blu Jaz Cafe', lng: 103.8567434, lat: 1.3006284 },
+  { name: 'Candour Coffee', lng: 103.8557405, lat: 1.2960791 },
+  { name: 'Bugis MRT', lng: 103.8534648, lat: 1.3008724 },
+  { name: 'Book Point', lng: 103.8525092, lat: 1.2969103 }
+];
+```
+
+components/map_markers_without_d3/index.js:
 
 ```
 export default {
-  name: 'map-marker-without-d3',
+  name: 'map-markers-without-d3',
   template,
   props: {
     google: Object, // Provided by "components/google_map_loader".
     map: Object, // Provided by "components/google_map_loader".
+    markers: Array, // Given directly from "views/map".
+  },
+  data() {
+    return {};
   },
   mounted() {
-    const { google, map } = this;
-    setTriangle({ google, map });
-    setSingapore({ google, map });
+    const { map } = this;
+    const { Marker } = this.google.maps;
+    this.markers.forEach((marker) => {
+      const { name: title, lat, lng } = marker || {};
+      const position = { lat, lng };
+      const x = new Marker({ title, map, position });
+    });
   },
 };
 ```
 
 #### Component 3: "components/map_overlay"
 
-For this, when `google` and `map` is given,
-adds a new Google Overlay layer to the map,
-and projects a SVG rendered overlay of certain places:
+When `google` and `map` is given, it adds a new Google Overlay layer to the map,
+and projects a SVG rendered overlay,
+but for this time, we load 2 geojson data:
+
+1. Singapore Regional Geojson (in Multipolygon) (stored within `assets` folder)
+2. Simple polygon in Geojson format (defined within JS directly)
 
 components/map_overlay/index.js:
 
@@ -210,8 +324,7 @@ export default {
 };
 ```
 
-Bellow is one of the overlay definitions (among 2 defined)
-to show you how d3 SVG overlay is created:
+For your understanding, here's how `setTriangle` look like:
 
 components/overlay_layer/index.js:  
 (altered the order of definitions for ease of reading)
@@ -226,10 +339,14 @@ const setTriangle = compose(
     return {
       ...o,
       draw: function draw() {
+        // Create a projector for the overlay path generation.
         const projection = this.getProjection();
         const projector = projectorFactory({ google, projection });
+        // Every time dragging the map around,
+        // removes SVG elements created previously.
         const layer = d3.select(`.${layer_name}`);
         layer.select(`.${svg_name}`).remove();
+        // Newly created SVG element to contain the overlay PATH.
         const svg = layer.append('svg').attr('class', svg_name);
         const g = svg.append('g').attr('class', group_name);
         g.selectAll('path')
@@ -276,34 +393,41 @@ const setOverlay = (o) => {
   return o;
 };
 
-const getLayerName = key => (key && `layer-${key}`) || 'mlayer';
-const getSvgName = key => (key && `svg-${key}`) || 'msvg';
-const getGroupName = key => (key && `group-${key}`) || 'mgroup';
-const getPathName = key => d => (`path-${key}${(d && d.id && `-${d.id}`) || ''}`);
+#### This is discussed later...
+const projectorFactory = ({ google, projection, options }) => {
+  const { padding = DEFAULT_PADDING_SIZE } = options || {};
+  const point = function pointStream(lng, lat) {
+    const p = new google.maps.LatLng(lat, lng);
+    const { x = 0, y = 0 } = projection.fromLatLngToDivPixel(p) || {};
+    this.stream.point(x + padding, y + padding);
+  };
+  return d3.geoPath().projection(d3.geoTransform({ point }));
+};
+```
 
-const getFillColor = (mapping => (key => mapping[key]))({
-  triangle: '#ff0000',
-  singapore: (d, i) => colorScale(i),
-});
+#### Component 4: "components/map_overlay_without_d3"
 
-const getStrokeColor = (mapping => (key => mapping[key]))({
-  singapore: '#604000',
-});
+This is another example for the use of Geojson, however, without d3.  
+Quite straigt forward, isn't it?
 
-const getOpacity = (mapping => (key => mapping[key]))({
-  triangle: 0.4,
-  singapore: 0.4,
-});
-
-const getLabelFillColor = (mapping => (key => mapping[key]))({
-  singapore: '#101010',
-});
-
-const getLabelOpacity = (mapping => (key => mapping[key]))({
-  singapore: 0.6,
-});
+components/map_overlay_without_d3/index.js:
 
 ```
+export default {
+  name: 'map-overlay-without-d3',
+  template,
+  props: {
+    google: Object, // Provided by "components/google_map_loader".
+    map: Object, // Provided by "components/google_map_loader".
+  },
+  mounted() {
+    const { map } = this;
+    map.data.addGeoJson(data);
+    map.data.setStyle(map_style);
+  },
+};
+```
+
 
 
 ## 3. Tips (on other issues)
