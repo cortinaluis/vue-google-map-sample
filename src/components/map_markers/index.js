@@ -11,15 +11,17 @@ import './style.styl';
 // and later set them back to the original position (in JS).
 const DEFAULT_PADDING_SIZE = 5000;
 
-const getLayerName = () => 'marker-layer';
-const getSvgName = () => 'marker-svg';
-const getGroupName = () => 'marker-group';
-const getGroupNameCircle = () => 'marker-group-circle';
-const getRadius = () => '4px';
-const getFillColor = () => '#d80a1f';
-const getOpacity = () => 0.95;
-const getLabelFillColor = () => '#202020';
-const getLabelOpacity = () => 0.9;
+const DEFAULT_OVERLAY_SETTINGS = {
+  layer_name:        'marker-layer',
+  svg_name:          'marker-svg',
+  group_name:        'marker-group',
+  group_name_circle: 'marker-group-circle',
+  radius:            '4px',
+  fill:              '#d80a1f',
+  opacity:           0.95,
+  label_fill:        '#202020',
+  label_opacity:     0.9,
+};
 
 /**
  * Provides a transformer (translate) for marker positions.
@@ -42,20 +44,7 @@ const translateFactory = ({ google, projection, options }) => (d) => {
  * Called before defining "draw".
  * @returns {Function}
  */
-const initOverlay = (o = {}) => ({
-  ...o,
-  ...{
-    layer_name:        getLayerName(),
-    svg_name:          getSvgName(),
-    group_name:        getGroupName(),
-    group_name_circle: getGroupNameCircle(),
-    radius:            getRadius(),
-    fill:              getFillColor(),
-    opacity:           getOpacity(),
-    label_fill:        getLabelFillColor(),
-    label_opacity:     getLabelOpacity(),
-  },
-});
+const initOverlay = (o = {}) => ({ ...o, ...DEFAULT_OVERLAY_SETTINGS });
 
 /**
  * Once "draw" is defined, then it applies "draw" to "onAdd".
@@ -137,6 +126,7 @@ export default {
     google: Object, // Provided by "components/google_map_loader".
     map: Object, // Provided by "components/google_map_loader".
     markers: Array, // Given directly from "views/map".
+    show: Boolean, // Given directly from "views/map".
   },
   data() {
     return {};

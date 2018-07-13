@@ -3,6 +3,9 @@
  */
 import template from './template.html';
 
+// Singapore Botanic Gardens: [103.8137249, 1.3138451]
+// Singapore Zoo: [103.7908343, 1.4043539]
+// Punggol Park: [103.8955356, 1.377199]
 import data from '../../assets/json/without_d3.geojson';
 
 const map_style = {
@@ -13,17 +16,39 @@ const map_style = {
   strokeWeight: 1,
 };
 
+let saved = [];
+
 export default {
   name: 'map-overlay-without-d3',
   template,
   props: {
     google: Object, // Provided by "components/google_map_loader".
     map: Object, // Provided by "components/google_map_loader".
+    show: Boolean, // Given directly from "views/map".
+  },
+  watch: {
+    show(val) {
+      this.hideOverlay();
+      if (val) {
+        this.showOverlay();
+      }
+    }
   },
   mounted() {
-    const { map } = this;
-    map.data.addGeoJson(data);
-    map.data.setStyle(map_style);
+    this.showOverlay();
+  },
+  methods: {
+    showOverlay() {
+      const { map } = this;
+      saved = map.data.addGeoJson(data);
+      map.data.setStyle(map_style);
+    },
+    hideOverlay() {
+      const { map } = this;
+      saved.forEach((coord) => {
+        map.data.remove(coord);
+      });
+    },
   },
 };
 

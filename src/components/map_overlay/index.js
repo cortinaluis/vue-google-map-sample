@@ -277,11 +277,33 @@ export default {
   props: {
     google: Object, // Provided by "components/google_map_loader".
     map: Object, // Provided by "components/google_map_loader".
+    show: Boolean, // Given directly from "views/map".
   },
+  // watch: {
+  //   show(val) {
+  //     this.hideOverlay();
+  //     if (val) {
+  //       this.showOverlay();
+  //     }
+  //   }
+  // },
   mounted() {
     const { google, map } = this;
     setTriangle({ google, map });
     setSingapore({ google, map });
   },
+  // methods: {
+  //   showOverlay() {
+  //     const { map } = this;
+  //     saved = map.data.addGeoJson(data);
+  //     map.data.setStyle(map_style);
+  //   },
+  //   hideOverlay() {
+  //     const { map } = this;
+  //     saved.forEach((coord) => {
+  //       map.data.remove(coord);
+  //     });
+  //   },
+  // },
 };
 

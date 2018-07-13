@@ -180,14 +180,10 @@ const setMarkers = compose(
     return {
       ...o,
       draw: function draw() {
-        // Create a projector for the overlay path generation.
         const projection = this.getProjection();
         const translate = translateFactory({ google, projection });
-        // Every time dragging the map around,
-        // removes SVG elements created previously.
         const layer = d3.select(`.${layer_name}`);
         layer.select(`.${svg_name}`).remove();
-        // Newly created SVG element to contain the overlay PATH.
         const svg = layer.append('svg').attr('class', svg_name);
         const g = svg.append('g').attr('class', group_name);
         g.selectAll('path')
@@ -195,12 +191,11 @@ const setMarkers = compose(
           .enter()
           .append('g')
           .attr('transform', translate)
-          .attr('class', group_name_circle) // Function deteminines class name by "i" given.
+          .attr('class', group_name_circle)
           .append('circle')
           .attr('r', radius)
           .style('fill', fill)
           .style('opacity', opacity);
-
         g.selectAll('.label')
           .data(markers)
           .enter()
@@ -218,20 +213,7 @@ const setMarkers = compose(
   initOverlay,
 );
 
-const initOverlay = (o = {}) => ({
-  ...o,
-  ...{
-    layer_name:        getLayerName(),
-    svg_name:          getSvgName(),
-    group_name:        getGroupName(),
-    group_name_circle: getGroupNameCircle(),
-    radius:            getRadius(),
-    fill:              getFillColor(),
-    opacity:           getOpacity(),
-    label_fill:        getLabelFillColor(),
-    label_opacity:     getLabelOpacity(),
-  },
-});
+const initOverlay = (o = {}) => ({ ...o, ...DEFAULT_OVERLAY_SETTINGS });
 
 const setOverlay = (o) => {
   const { google, map, layer_name, draw } = o || {};
@@ -339,14 +321,10 @@ const setTriangle = compose(
     return {
       ...o,
       draw: function draw() {
-        // Create a projector for the overlay path generation.
         const projection = this.getProjection();
         const projector = projectorFactory({ google, projection });
-        // Every time dragging the map around,
-        // removes SVG elements created previously.
         const layer = d3.select(`.${layer_name}`);
         layer.select(`.${svg_name}`).remove();
-        // Newly created SVG element to contain the overlay PATH.
         const svg = layer.append('svg').attr('class', svg_name);
         const g = svg.append('g').attr('class', group_name);
         g.selectAll('path')
@@ -354,7 +332,7 @@ const setTriangle = compose(
           .enter()
           .append('path')
           .attr('d', projector)
-          .attr('class', path_name) // Function deteminines class name by "i" given.
+          .attr('class', path_name)
           .style('fill', fill)
           .style('opacity', opacity);
       },

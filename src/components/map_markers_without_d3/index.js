@@ -8,6 +8,7 @@ export default {
     google: Object, // Provided by "components/google_map_loader".
     map: Object, // Provided by "components/google_map_loader".
     markers: Array, // Given directly from "views/map".
+    show: Boolean, // Given directly from "views/map".
   },
   data() {
     return {};

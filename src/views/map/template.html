@@ -1,4 +1,18 @@
 <div id="map">
+    <div id="map-control">
+        <div class="map-control-row">
+            <input type="checkbox" id="show-markers-d3" value="markers-d3" v-model="show" />
+            <label for="show-markers-d3">markers (d3)</label>
+            <input type="checkbox" id="show-markers-without-d3" value="markers-without-d3" v-model="show" />
+            <label for="show-markers-without-d3">markers (without d3)</label>
+        </div>
+        <div class="map-control-row">
+            <input type="checkbox" id="show-overlay-d3" value="overlay-d3" v-model="show" />
+            <label for="show-overlay-d3">overlay (d3)</label>
+            <input type="checkbox" id="show-overlay-without-d3" value="overlay-without-d3" v-model="show" />
+            <label for="show-overlay-without-d3">overlay (without d3)</label>
+        </div>
+    </div>
     <google-map-loader :map-elem-id="mapElemId" :api-key="apiKey" :config="config" :is-ready="isReady">
         <!-- The slot bellow ("map") will be deployed to <slot> in "components/google_map_loader". -->
         <template slot="map-base">
@@ -12,10 +26,12 @@
              (the same for "components/map_markers_without_d3")
         -->
         <template slot="map-others" slot-scope="{ google, map }">
-            <map-markers :google="google" :map="map" :markers="markers" />
-            <map-markers-without-d3 :google="google" :map="map" :markers="markers_without_d3" />
-            <map-overlay :google="google" :map="map" />
-            <map-overlay-without-d3 :google="google" :map="map" />
+            <map-markers
+                :google="google" :map="map" :markers="markers" :show="showMarkers" />
+            <map-markers-without-d3
+                :google="google" :map="map" :markers="markers_without_d3" :show="showMarkersWithoutD3" />
+            <map-overlay :google="google" :map="map" :show="showOverlay" />
+            <map-overlay-without-d3 :google="google" :map="map" :show="showOverlayWithoutD3" />
         </template>
     </google-map-loader>
 </div>
