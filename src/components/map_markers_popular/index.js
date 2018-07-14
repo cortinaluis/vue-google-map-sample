@@ -1,4 +1,5 @@
 /* eslint object-curly-newline: [0] */
+/* eslint no-multi-spaces: [0] */
 /* eslint no-unused-vars: [1] */
 import { compose } from 'ramda';
 import * as d3 from 'd3';
@@ -6,22 +7,12 @@ import * as d3 from 'd3';
 import template from './template.html';
 import './style.styl';
 
+const BASE_KEY = 'popular';
+
 // To prevent the weird overlay clipping while dragging the map around,
 // we intentionally shift "top" and "left" of the SVG element (in CSS),
 // and later set them back to the original position (in JS).
 const DEFAULT_PADDING_SIZE = 5000;
-
-const DEFAULT_OVERLAY_SETTINGS = {
-  layer_name:        'marker-layer',
-  svg_name:          'marker-svg',
-  group_name:        'marker-group',
-  group_name_circle: 'marker-group-circle',
-  radius:            '4px',
-  fill:              '#d80a1f',
-  opacity:           0.95,
-  label_fill:        '#202020',
-  label_opacity:     0.9,
-};
 
 /**
  * Provides a transformer (translate) for marker positions.
@@ -38,13 +29,33 @@ const translateFactory = ({ google, projection, options }) => (d) => {
   return `translate(${x + padding},${y + padding})`;
 };
 
+const layerName = key => `layer-${key}`;
+const svgName = key => `svg-${key}`;
+const groupName = key => `group-${key}`;
+const groupNameCircle = key => `group-${key}`;
+
+const radius         = '4px';
+const fill           = '#d80a1f';
+const opacity        = 0.95;
+const label_fill     = '#202020';
+const label_opacity  = 0.9;
+
 /**
  * Not really doing anything significant.
  * Just prepares some class and ID names.
  * Called before defining "draw".
  * @returns {Function}
  */
-const initOverlay = (o = {}) => ({ ...o, ...DEFAULT_OVERLAY_SETTINGS });
+const initOverlay = (o) => {
+  const { key } = o || {};
+  return {
+    ...o,
+    layer_name:         layerName(key),
+    svg_name:           svgName(key),
+    group_name:         groupName(key),
+    group_name_circle:  groupNameCircle(key),
+  };
+};
 
 /**
  * Once "draw" is defined, then it applies "draw" to "onAdd".
@@ -76,7 +87,6 @@ const setMarkers = compose(
   (o) => {
     const {
       google, markers, layer_name, svg_name, group_name, group_name_circle,
-      radius, fill, opacity, label_fill, label_opacity,
     } = o || {};
     return {
       ...o,
@@ -120,19 +130,33 @@ const setMarkers = compose(
 );
 
 export default {
-  name: 'map-markers',
+  name: 'map-markers-popular',
   template,
   props: {
     google: Object, // Provided by "components/google_map_loader".
     map: Object, // Provided by "components/google_map_loader".
-    markers: Array, // Given directly from "views/map".
     show: Boolean, // Given directly from "views/map".
   },
   data() {
-    return {};
+    return {
+      markers: [
+        { name: 'Raffles Hotel', lng: 103.8522904, lat: 1.2948883 },
+        { name: 'Singapore Botanic Gardens', lng: 103.8137249, lat: 1.3138451 },
+        { name: 'Changi Airport Singapore', lng: 103.9893421, lat: 1.3644256 },
+      ],
+    };
+  },
+  watch: {
+    show(val) {
+      const layer_name = layerName(BASE_KEY);
+      const el = document.body.querySelector(`.${layer_name}`);
+      if (el) {
+        el.style.visibility = val ? 'visible' : 'hidden';
+      }
+    },
   },
   mounted() {
     const { google, map, markers } = this;
-    setMarkers({ google, map, markers });
+    setMarkers({ google, map, markers, key: BASE_KEY });
   },
 };

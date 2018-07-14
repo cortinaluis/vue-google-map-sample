@@ -9,11 +9,11 @@ import template from './template.html';
 import data from '../../assets/json/without_d3.geojson';
 
 const map_style = {
-  fillColor: '#40b500',
-  fillOpacity: 0.3,
-  strokeColor: '#305000',
-  strokeOpacity: 0.2,
-  strokeWeight: 1,
+  fillColor:      '#40b500',
+  fillOpacity:    0.3,
+  strokeColor:    '#305000',
+  strokeOpacity:  0.2,
+  strokeWeight:   1,
 };
 
 let saved = [];

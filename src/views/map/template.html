@@ -1,37 +1,43 @@
 <div id="map">
     <div id="map-control">
         <div class="map-control-row">
-            <input type="checkbox" id="show-markers-d3" value="markers-d3" v-model="show" />
-            <label for="show-markers-d3">markers (d3)</label>
-            <input type="checkbox" id="show-markers-without-d3" value="markers-without-d3" v-model="show" />
-            <label for="show-markers-without-d3">markers (without d3)</label>
+            <input type="checkbox" id="markers-pop" value="markers_pop" v-model="checklist" />
+            <label for="markers-pop">markers: Popular (d3)</label>
+            <input type="checkbox" id="markers-shops" value="markers_shops" v-model="checklist" />
+            <label for="markers-shops">markers: Shops (without d3)</label>
         </div>
         <div class="map-control-row">
-            <input type="checkbox" id="show-overlay-d3" value="overlay-d3" v-model="show" />
-            <label for="show-overlay-d3">overlay (d3)</label>
-            <input type="checkbox" id="show-overlay-without-d3" value="overlay-without-d3" v-model="show" />
-            <label for="show-overlay-without-d3">overlay (without d3)</label>
+            <input type="checkbox" id="overlay-triangle-green" value="overlay_triangle_green" v-model="checklist" />
+            <label for="overlay-triangle-green">overlay: Green (without d3)</label>
+            <input type="checkbox" id="overlay-triangle-red" value="overlay_triangle_red" v-model="checklist" />
+            <label for="overlay-triangle-red">overlay: Red (d3)</label>
+            <input type="checkbox" id="overlay-singapore" value="overlay_singapore" v-model="checklist" />
+            <label for="overlay-singapore">overlay: Singapore (d3)</label>
         </div>
     </div>
     <google-map-loader :map-elem-id="mapElemId" :api-key="apiKey" :config="config" :is-ready="isReady">
-        <!-- The slot bellow ("map") will be deployed to <slot> in "components/google_map_loader". -->
+        <!--
+             We have a slot in "components/google_map_loader"
+             which will be rendered later as it uses
+             the bellow named slot template "map-base".
+        -->
         <template slot="map-base">
             <div v-bind:id="mapElemId" />
         </template>
         <!--
-             The "others" slot will be deployed to <slot> in "components/google_map_loader".
-             Notice how "components/google_map_loader" provides "google" and "map".
-             Here, we simply destructure them for our own use.
-             Notice, also, we are passing "marker" to "components/map_markers".
-             (the same for "components/map_markers_without_d3")
+             We have a slot in "components/google_map_loader"
+             which will be rendered later as it uses
+             the bellow named slot template "map-others".
+             Also, notice how "components/google_map_loader"
+             provides "google" and "map" as we destructure them
+             to pass them this time to 5 child components.
         -->
         <template slot="map-others" slot-scope="{ google, map }">
-            <map-markers
-                :google="google" :map="map" :markers="markers" :show="showMarkers" />
-            <map-markers-without-d3
-                :google="google" :map="map" :markers="markers_without_d3" :show="showMarkersWithoutD3" />
-            <map-overlay :google="google" :map="map" :show="showOverlay" />
-            <map-overlay-without-d3 :google="google" :map="map" :show="showOverlayWithoutD3" />
+            <map-markers-shops :google="google" :map="map" :show="show.markers_shops" />
+            <map-markers-popular :google="google" :map="map" :show="show.markers_pop" />
+            <map-overlay-triangle-green :google="google" :map="map" :show="show.overlay_triangle_green" />
+            <map-overlay-triangle-red :google="google" :map="map" :show="show.overlay_triangle_red" />
+            <map-overlay-singapore :google="google" :map="map" :show="show.overlay_singapore" />
         </template>
     </google-map-loader>
 </div>
