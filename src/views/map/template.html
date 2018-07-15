@@ -1,18 +1,18 @@
 <div id="map">
     <div id="map-control">
         <div class="map-control-row">
-            <input type="checkbox" id="markers-pop" value="markers_pop" v-model="checklist" />
-            <label for="markers-pop">markers: Popular (d3)</label>
-            <input type="checkbox" id="markers-shops" value="markers_shops" v-model="checklist" />
-            <label for="markers-shops">markers: Shops (without d3)</label>
+            <input type="checkbox" id="markers-without-d3" value="markers_without_d3" v-model="checklist" />
+            <label for="markers-without-d3">markers (without d3)</label>
+            <input type="checkbox" id="markers-d3" value="markers_d3" v-model="checklist" />
+            <label for="markers-d3">markers (d3)</label>
         </div>
         <div class="map-control-row">
-            <input type="checkbox" id="overlay-triangle-green" value="overlay_triangle_green" v-model="checklist" />
-            <label for="overlay-triangle-green">overlay: Green (without d3)</label>
-            <input type="checkbox" id="overlay-triangle-red" value="overlay_triangle_red" v-model="checklist" />
-            <label for="overlay-triangle-red">overlay: Red (d3)</label>
-            <input type="checkbox" id="overlay-singapore" value="overlay_singapore" v-model="checklist" />
-            <label for="overlay-singapore">overlay: Singapore (d3)</label>
+            <input type="checkbox" id="overlay-without-d3" value="overlay_without_d3" v-model="checklist" />
+            <label for="overlay-without-d3">overlay: Green Triangle (without d3)</label>
+            <input type="checkbox" id="overlay-d3-triangle" value="overlay_d3_triangle" v-model="checklist" />
+            <label for="overlay-d3-triangle">overlay: Red Triangle (d3)</label>
+            <input type="checkbox" id="overlay-d3-singapore" value="overlay_d3_singapore" v-model="checklist" />
+            <label for="overlay-d3-singapore">overlay: Singapore (d3)</label>
         </div>
     </div>
     <google-map-loader :map-elem-id="mapElemId" :api-key="apiKey" :config="config" :is-ready="isReady">
@@ -33,11 +33,11 @@
              to pass them this time to 5 child components.
         -->
         <template slot="map-others" slot-scope="{ google, map }">
-            <map-markers-shops :google="google" :map="map" :show="show.markers_shops" />
-            <map-markers-popular :google="google" :map="map" :show="show.markers_pop" />
-            <map-overlay-triangle-green :google="google" :map="map" :show="show.overlay_triangle_green" />
-            <map-overlay-triangle-red :google="google" :map="map" :show="show.overlay_triangle_red" />
-            <map-overlay-singapore :google="google" :map="map" :show="show.overlay_singapore" />
+            <map-markers-without-d3 :google="google" :map="map" :show="show.markers_without_d3" />
+            <map-markers-d3 :google="google" :map="map" :show="show.markers_d3" />
+            <map-overlay-without-d3 :google="google" :map="map" :show="show.overlay_without_d3" />
+            <map-overlay-d3-triangle :google="google" :map="map" :show="show.overlay_d3_triangle" />
+            <map-overlay-d3-singapore :google="google" :map="map" :show="show.overlay_d3_singapore" />
         </template>
     </google-map-loader>
 </div>

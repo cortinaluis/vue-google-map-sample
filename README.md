@@ -60,11 +60,11 @@ view/map/template.html:
         <div v-bind:id="mapElemId" />
     </template>
     <template slot="map-others" slot-scope="{ google, map }">
-        <map-markers-shops :google="google" :map="map" :show="show.markers_shops" />
-        <map-markers-popular :google="google" :map="map" :show="show.markers_pop" />
-        <map-overlay-triangle-green :google="google" :map="map" :show="show.overlay_triangle_green" />
-        <map-overlay-triangle-red :google="google" :map="map" :show="show.overlay_triangle_red" />
-        <map-overlay-singapore :google="google" :map="map" :show="show.overlay_singapore" />
+        <map-markers-without-d3 :google="google" :map="map" :show="show.markers_without_d3" />
+        <map-markers-d3 :google="google" :map="map" :show="show.markers_d3" />
+        <map-overlay-without-d3 :google="google" :map="map" :show="show.overlay_without_d3" />
+        <map-overlay-d3-triangle :google="google" :map="map" :show="show.overlay_d3_triangle" />
+        <map-overlay-d3-singapore :google="google" :map="map" :show="show.overlay_d3_singapore" />
     </template>
 </google-map-loader>
 ```
@@ -109,28 +109,28 @@ Like this:
 
 ```
     <template slot="map-others" slot-scope="{ google, map }">
-        <map-markers-shops :google="google" :map="map" :show="show.markers_shops" />
-        <map-markers-popular :google="google" :map="map" :show="show.markers_pop" />
-        <map-overlay-triangle-green :google="google" :map="map" :show="show.overlay_triangle_green" />
-        <map-overlay-triangle-red :google="google" :map="map" :show="show.overlay_triangle_red" />
-        <map-overlay-singapore :google="google" :map="map" :show="show.overlay_singapore" />
+        <map-markers-without-d3 :google="google" :map="map" :show="show.markers_without_d3" />
+        <map-markers-d3 :google="google" :map="map" :show="show.markers_d3" />
+        <map-overlay-without-d3 :google="google" :map="map" :show="show.overlay_without_d3" />
+        <map-overlay-d3-triangle :google="google" :map="map" :show="show.overlay_d3_triangle" />
+        <map-overlay-d3-singapore :google="google" :map="map" :show="show.overlay_d3_singapore" />
     </template>
 ```
 
 Notice also, as it receives `google` and `map` from the wrapper component,
 it is now *bypassing* these 2 props, this time, to 5 of the following components:
 
-Component 1: `components/map_marker_shops`  
-Component 2: `components/map_marker_popular`  
-Component 3: `components/map_overlay_triangle_green`  
-Component 3: `components/map_overlay_triangle_red`  
-Component 4: `components/map_overlay_singapore`
+Component 1: `components/map_marker_without_d3`  
+Component 2: `components/map_marker_d3`  
+Component 3: `components/map_overlay_without_d3`  
+Component 3: `components/map_overlay_d3_triangle`  
+Component 4: `components/map_overlay_d3_singapore`
 
-#### Component 1: "components/map_marker_shops"
+#### Component 1: "components/map_marker_without_d3"
 
 This is a demonstration just to show you that you can plot markers without using d3.
 
-components/map_markers_shops/index.js:
+components/map_markers_without_d3/index.js:
 
 ```
 export default {
@@ -167,22 +167,23 @@ export default {
     markers.forEach(({ name: title, lat, lng }) => {
       const position = { lat, lng };
       const marker = new Marker({ title, map, position });
+      marker.setVisible(false);
       this.instances.push(marker);
     });
   },
 };
 ```
 
-#### Component 2: "components/map_markers_popular"
+#### Component 2: "components/map_markers_d3"
 
 When `google` and `map` is given, it adds a new Google Overlay layer to the map,
 and projects a SVG rendered overlay.
 
-components/map_markers_popular/index.js:
+components/map_markers_d3/index.js:
 
 ```
 export default {
-  name: 'map-markers-popular',
+  name: 'map-markers-d3',
   template,
   props: {
     google: Object, // Provided by "components/google_map_loader".
@@ -200,9 +201,9 @@ export default {
   },
   watch: {
     show(val) {
-      const layer_name = layerName(BASE_KEY);
-      const el = document.body.querySelector(`.${layer_name}`);
+      const el = document.body.querySelector(`.${layerName(BASE_KEY)}`);
       if (el) {
+        console.log('!!!!!!!');
         el.style.visibility = val ? 'visible' : 'hidden';
       }
     },
@@ -231,14 +232,10 @@ const setMarkers = compose(
     return {
       ...o,
       draw: function draw() {
-        // Create a projector for the overlay path generation.
         const projection = this.getProjection();
         const translate = translateFactory({ google, projection });
-        // Every time dragging the map around,
-        // removes SVG elements created previously.
         const layer = d3.select(`.${layer_name}`);
         layer.select(`.${svg_name}`).remove();
-        // Newly created SVG element to contain the overlay PATH.
         const svg = layer.append('svg').attr('class', svg_name);
         const g = svg.append('g').attr('class', group_name);
         g.selectAll('path')
@@ -246,12 +243,11 @@ const setMarkers = compose(
           .enter()
           .append('g')
           .attr('transform', translate)
-          .attr('class', group_name_circle) // Function deteminines class name by "i" given.
+          .attr('class', group_name_circle)
           .append('circle')
           .attr('r', radius)
           .style('fill', fill)
           .style('opacity', opacity);
-
         g.selectAll('.label')
           .data(markers)
           .enter()
@@ -288,7 +284,8 @@ const setOverlay = (o) => {
     d3.select(this.getPanes().overlayLayer)
       .append('div')
       .attr('class', layer_name)
-      .style('position', 'absolute');
+      .style('position', 'absolute')
+      .style('visibility', 'hidden');
     this.draw = draw;
   };
   return o;
@@ -304,12 +301,12 @@ const translateFactory = ({ google, projection, options }) => (d) => {
 ```
 
 
-#### Component 3: "components/map_overlay_triangle_green"
+#### Component 3: "components/map_overlay_without_d3"
 
 This is another example for the use of Geojson, however, without d3.  
 Quite straigt forward, isn't it?
 
-components/map_overlay_triangle_green/index.js:
+components/map_overlay_without_d3/index.js:
 
 ```
 export default {
@@ -318,29 +315,46 @@ export default {
   props: {
     google: Object, // Provided by "components/google_map_loader".
     map: Object, // Provided by "components/google_map_loader".
+    show: Boolean, // Given directly from "views/map".
   },
-  mounted() {
-    const { map } = this;
-    map.data.addGeoJson(data);
-    map.data.setStyle(map_style);
+  watch: {
+    show(val) {
+      this.hideOverlay();
+      if (val) {
+        this.showOverlay();
+      }
+    }
+  },
+  methods: {
+    showOverlay() {
+      const { map } = this;
+      saved = map.data.addGeoJson(data);
+      map.data.setStyle(map_style);
+    },
+    hideOverlay() {
+      const { map } = this;
+      saved.forEach((coord) => {
+        map.data.remove(coord);
+      });
+    },
   },
 };
 ```
 
 
-#### Component 4: "components/map_overlay_triangle_red"
-#### Component 5: "components/map_overlay_singapore"
+#### Component 4: "components/map_overlay_d3_triangle"
+#### Component 5: "components/map_overlay_d3_singapore"
 
 When `google` and `map` is given, it adds a new Google Overlay layer to the map,
 and projects a SVG rendered overlay,
 loading a simple polygon in Geojson format (defined within JS directly)  
 (altered the order of definitions for ease of reading)
 
-components/map_overlay_triangle_red/index.js:
+components/map_overlay_d3_triangle/index.js:
 
 ```
 export default {
-  name: 'map-overlay-triangle-red',
+  name: 'map-overlay-d3-triangle',
   template,
   props: {
     google: Object, // Provided by "components/google_map_loader".
@@ -375,14 +389,10 @@ const drawFactory = (o) => {
   return {
     ...o,
     draw: function draw() {
-      // Create a projector for the overlay path generation.
       const projection = this.getProjection();
       const projector = projectorFactory({ google, projection });
-      // Every time dragging the map around,
-      // removes SVG elements created previously.
       const layer = d3.select(`.${layer_name}`);
       layer.select(`.${svg_name}`).remove();
-      // Newly created SVG element to contain the overlay PATH.
       const svg = layer.append('svg').attr('class', svg_name);
       const g = svg.append('g').attr('class', group_name);
       g.selectAll('path')
@@ -416,7 +426,8 @@ const setOverlay = (o) => {
     d3.select(this.getPanes().overlayLayer)
       .append('div')
       .attr('class', layer_name)
-      .style('position', 'absolute');
+      .style('position', 'absolute')
+      .style('visibility', 'hidden');
     this.draw = draw;
   };
   return o;
@@ -431,9 +442,9 @@ const setOverlay = (o) => {
 [Since v4, d3 uses "stream" for all the map projection handlings](https://github.com/d3/d3-geo#streams).
 Hence, we need the following function to convert (1) coodinates to a stream, and (2) stream to d3 path:
 
-Component 2: `components/map_marker_popular`  
-Component 3: `components/map_overlay_triangle_red`  
-Component 4: `components/map_overlay_singapore`
+Component 2: `components/map_marker_d3`  
+Component 3: `components/map_overlay_d3_triangle`  
+Component 4: `components/map_overlay_d3_singapore`
 
 ```
 const projectorFactory = ({ google, projection, options }) => {
