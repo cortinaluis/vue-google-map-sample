@@ -88,7 +88,8 @@ const setOverlay = (o) => {
     d3.select(this.getPanes().overlayLayer)
       .append('div')
       .attr('class', layer_name)
-      .style('position', 'absolute');
+      .style('position', 'absolute')
+      .style('visibility', 'hidden');
     this.draw = draw;
   };
   return o;
@@ -142,7 +143,7 @@ const set = compose(
 );
 
 export default {
-  name: 'map-overlay-triangle-red',
+  name: 'map-overlay-d3-triangle',
   template,
   props: {
     google: Object, // Provided by "components/google_map_loader".

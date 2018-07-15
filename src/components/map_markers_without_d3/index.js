@@ -35,6 +35,7 @@ export default {
     markers.forEach(({ name: title, lat, lng }) => {
       const position = { lat, lng };
       const marker = new Marker({ title, map, position });
+      marker.setVisible(false);
       this.instances.push(marker);
     });
   },

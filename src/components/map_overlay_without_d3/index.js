@@ -34,9 +34,9 @@ export default {
       }
     }
   },
-  mounted() {
-    this.showOverlay();
-  },
+  // mounted() {
+  //   this.showOverlay();
+  // },
   methods: {
     showOverlay() {
       const { map } = this;

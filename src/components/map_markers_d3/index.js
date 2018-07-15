@@ -70,7 +70,8 @@ const setOverlay = (o) => {
     d3.select(this.getPanes().overlayLayer)
       .append('div')
       .attr('class', layer_name)
-      .style('position', 'absolute');
+      .style('position', 'absolute')
+      .style('visibility', 'hidden');
     this.draw = draw;
   };
   return o;
@@ -130,7 +131,7 @@ const setMarkers = compose(
 );
 
 export default {
-  name: 'map-markers-popular',
+  name: 'map-markers-d3',
   template,
   props: {
     google: Object, // Provided by "components/google_map_loader".
@@ -148,9 +149,9 @@ export default {
   },
   watch: {
     show(val) {
-      const layer_name = layerName(BASE_KEY);
-      const el = document.body.querySelector(`.${layer_name}`);
+      const el = document.body.querySelector(`.${layerName(BASE_KEY)}`);
       if (el) {
+        console.log('!!!!!!!');
         el.style.visibility = val ? 'visible' : 'hidden';
       }
     },
