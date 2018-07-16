@@ -1,10 +1,10 @@
 /* eslint no-unused-vars: [1] */
 import GoogleMapLoader from '@/components/google_map_loader';
 import MapMarkersWithoutD3 from '@/components/map_markers_without_d3';
-import MapMarkersD3 from '@/components/map_markers_d3';
+import MapMarkers from '@/components/map_markers';
 import MapOverlayWithoutD3 from '@/components/map_overlay_without_d3';
-import MapOverlayD3Triangle from '@/components/map_overlay_d3_triangle';
-import MapOverlayD3Singapore from '@/components/map_overlay_d3_singapore';
+import MapOverlayRedTriangle from '@/components/map_overlay_red_triangle';
+import MapOverlaySingapore from '@/components/map_overlay_singapore';
 
 import template from './template.html';
 import './style.styl';
@@ -18,10 +18,10 @@ const zoom = 10.75;
 
 const DEFAULT_CHECK_LIST = [
   'markers_without_d3',
-  'markers_d3',
+  'markers',
   'overlay_without_d3',
-  'overlay_d3_triangle',
-  'overlay_d3_singapore'
+  'overlay_red_triangle',
+  'overlay_singapore'
 ];
 
 export default {
@@ -39,38 +39,37 @@ export default {
   components: {
     GoogleMapLoader,
     MapMarkersWithoutD3,
-    MapMarkersD3,
+    MapMarkers,
     MapOverlayWithoutD3,
-    MapOverlayD3Triangle,
-    MapOverlayD3Singapore,
+    MapOverlayRedTriangle,
+    MapOverlaySingapore,
   },
   watch: {
-    checklist(arr = []) {
+    // Watch "checklist" if any has changed.
+    checklist(checked = []) {
+      // Make everything "false".
       DEFAULT_CHECK_LIST.forEach((key) => {
         this.show[key] = false;
       });
-      arr.forEach((key) => {
+      // Show checked.
+      checked.forEach((key) => {
         this.show[key] = true;
       });
     }
   },
-  mounted() {
-    this.checklist = [];
-  },
   methods: {
     isReady() {
+      setTimeout(() => {
+        DEFAULT_CHECK_LIST.forEach((key) => {
+          this.checklist.push(key);
+        });
+      }, 500);
       const el = this.$el.querySelector(`#${this.mapElemId}`);
       if (el) {
         const height = Math.trunc(window.innerHeight * 0.75);
         console.log(`Set the height for "${this.mapElemId}" being: ${height}px`);
         el.style.height = `${height}px`;
       }
-      setTimeout(() => {
-        DEFAULT_CHECK_LIST.forEach((key) => {
-          this.show[key] = true;
-          this.checklist.push(key);
-        });
-      }, 500);
     }
   },
 };

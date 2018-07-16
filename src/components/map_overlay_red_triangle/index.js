@@ -143,7 +143,7 @@ const set = compose(
 );
 
 export default {
-  name: 'map-overlay-d3-triangle',
+  name: 'map-overlay-red-triangle',
   template,
   props: {
     google: Object, // Provided by "components/google_map_loader".

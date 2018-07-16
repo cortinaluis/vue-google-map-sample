@@ -131,7 +131,7 @@ const setMarkers = compose(
 );
 
 export default {
-  name: 'map-markers-d3',
+  name: 'map-markers',
   template,
   props: {
     google: Object, // Provided by "components/google_map_loader".
@@ -151,7 +151,6 @@ export default {
     show(val) {
       const el = document.body.querySelector(`.${layerName(BASE_KEY)}`);
       if (el) {
-        console.log('!!!!!!!');
         el.style.visibility = val ? 'visible' : 'hidden';
       }
     },

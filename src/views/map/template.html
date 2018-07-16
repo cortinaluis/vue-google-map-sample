@@ -1,18 +1,18 @@
 <div id="map">
     <div id="map-control">
         <div class="map-control-row">
-            <input type="checkbox" id="markers-without-d3" value="markers_without_d3" v-model="checklist" />
-            <label for="markers-without-d3">markers (without d3)</label>
-            <input type="checkbox" id="markers-d3" value="markers_d3" v-model="checklist" />
-            <label for="markers-d3">markers (d3)</label>
+            <input type="checkbox" id="markers-0" value="markers_without_d3" v-model="checklist" />
+            <label for="markers-0">Google Markers</label>
+            <input type="checkbox" id="markers-1" value="markers" v-model="checklist" />
+            <label for="markers-1">d3 Markers</label>
         </div>
         <div class="map-control-row">
-            <input type="checkbox" id="overlay-without-d3" value="overlay_without_d3" v-model="checklist" />
-            <label for="overlay-without-d3">overlay: Green Triangle (without d3)</label>
-            <input type="checkbox" id="overlay-d3-triangle" value="overlay_d3_triangle" v-model="checklist" />
-            <label for="overlay-d3-triangle">overlay: Red Triangle (d3)</label>
-            <input type="checkbox" id="overlay-d3-singapore" value="overlay_d3_singapore" v-model="checklist" />
-            <label for="overlay-d3-singapore">overlay: Singapore (d3)</label>
+            <input type="checkbox" id="overlay-0" value="overlay_without_d3" v-model="checklist" />
+            <label for="overlay-0">Green (without d3)</label>
+            <input type="checkbox" id="overlay-1" value="overlay_red_triangle" v-model="checklist" />
+            <label for="overlay-1">Red (d3)</label>
+            <input type="checkbox" id="overlay-2" value="overlay_singapore" v-model="checklist" />
+            <label for="overlay-2">Singapore (d3)</label>
         </div>
     </div>
     <google-map-loader :map-elem-id="mapElemId" :api-key="apiKey" :config="config" :is-ready="isReady">
@@ -34,10 +34,10 @@
         -->
         <template slot="map-others" slot-scope="{ google, map }">
             <map-markers-without-d3 :google="google" :map="map" :show="show.markers_without_d3" />
-            <map-markers-d3 :google="google" :map="map" :show="show.markers_d3" />
+            <map-markers :google="google" :map="map" :show="show.markers" />
             <map-overlay-without-d3 :google="google" :map="map" :show="show.overlay_without_d3" />
-            <map-overlay-d3-triangle :google="google" :map="map" :show="show.overlay_d3_triangle" />
-            <map-overlay-d3-singapore :google="google" :map="map" :show="show.overlay_d3_singapore" />
+            <map-overlay-red-triangle :google="google" :map="map" :show="show.overlay_red_triangle" />
+            <map-overlay-singapore :google="google" :map="map" :show="show.overlay_singapore" />
         </template>
     </google-map-loader>
 </div>
