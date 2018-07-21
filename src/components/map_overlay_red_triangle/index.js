@@ -81,7 +81,7 @@ const initOverlay = (o) => {
  * @returns {Object}
  */
 const setOverlay = (o) => {
-  const { google, map, layer_name, draw } = o || {};
+  const { google, map, layer_name, draw, show = false } = o || {};
   const overlay = new google.maps.OverlayView();
   overlay.setMap(map);
   overlay.onAdd = function onAdd() {
@@ -89,7 +89,7 @@ const setOverlay = (o) => {
       .append('div')
       .attr('class', layer_name)
       .style('position', 'absolute')
-      .style('visibility', 'hidden');
+      .style('visibility', show ? 'visible' : 'hidden');
     this.draw = draw;
   };
   return o;
@@ -161,7 +161,7 @@ export default {
   },
   mounted() {
     const { google, map } = this;
-    set({ google, map, key: BASE_KEY });
+    set({ google, map, show: !!this.show, key: BASE_KEY });
   },
 };
 

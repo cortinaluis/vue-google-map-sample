@@ -24,6 +24,11 @@ const DEFAULT_CHECK_LIST = [
   'overlay_singapore'
 ];
 
+const STARTUP_CHECKS = [
+  'markers',
+  'overlay_red_triangle'
+];
+
 export default {
   name: 'MyGoogleMap',
   template,
@@ -47,23 +52,22 @@ export default {
   watch: {
     // Watch "checklist" if any has changed.
     checklist(checked = []) {
-      // Make everything "false".
       DEFAULT_CHECK_LIST.forEach((key) => {
         this.show[key] = false;
       });
-      // Show checked.
       checked.forEach((key) => {
         this.show[key] = true;
       });
     }
   },
+  mounted() {
+    STARTUP_CHECKS.forEach((key) => {
+      this.checklist.push(key);
+      this.show[key] = true;
+    });
+  },
   methods: {
     isReady() {
-      setTimeout(() => {
-        DEFAULT_CHECK_LIST.forEach((key) => {
-          this.checklist.push(key);
-        });
-      }, 500);
       const el = this.$el.querySelector(`#${this.mapElemId}`);
       if (el) {
         const height = Math.trunc(window.innerHeight * 0.75);

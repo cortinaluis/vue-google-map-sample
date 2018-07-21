@@ -32,10 +32,11 @@ export default {
   mounted() {
     const { map, markers } = this;
     const { Marker } = this.google.maps;
+    const visibility = !!this.show;
     markers.forEach(({ name: title, lat, lng }) => {
       const position = { lat, lng };
       const marker = new Marker({ title, map, position });
-      marker.setVisible(false);
+      marker.setVisible(visibility);
       this.instances.push(marker);
     });
   },

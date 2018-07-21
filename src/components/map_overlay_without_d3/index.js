@@ -34,6 +34,12 @@ export default {
       }
     }
   },
+  mounted() {
+    this.hideOverlay();
+    if (this.show) {
+      this.showOverlay();
+    }
+  },
   methods: {
     showOverlay() {
       const { map } = this;
