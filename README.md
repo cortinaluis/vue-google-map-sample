@@ -164,10 +164,11 @@ export default {
   mounted() {
     const { map, markers } = this;
     const { Marker } = this.google.maps;
+    const visibility = !!this.show;
     markers.forEach(({ name: title, lat, lng }) => {
       const position = { lat, lng };
       const marker = new Marker({ title, map, position });
-      marker.setVisible(false);
+      marker.setVisible(visibility);
       this.instances.push(marker);
     });
   },
@@ -209,7 +210,7 @@ export default {
   },
   mounted() {
     const { google, map, markers } = this;
-    setMarkers({ google, map, markers, key: BASE_KEY });
+    setMarkers({ google, map, markers, show: !!this.show, key: BASE_KEY });
   },
 };
 ```
@@ -276,7 +277,7 @@ const initOverlay = (o) => {
 };
 
 const setOverlay = (o) => {
-  const { google, map, layer_name, draw } = o || {};
+  const { google, map, layer_name, draw, show = false } = o || {};
   const overlay = new google.maps.OverlayView();
   overlay.setMap(map);
   overlay.onAdd = function onAdd() {
@@ -284,7 +285,7 @@ const setOverlay = (o) => {
       .append('div')
       .attr('class', layer_name)
       .style('position', 'absolute')
-      .style('visibility', 'hidden');
+      .style('visibility', show ? 'visible' : 'hidden');
     this.draw = draw;
   };
   return o;
@@ -322,6 +323,12 @@ export default {
       if (val) {
         this.showOverlay();
       }
+    }
+  },
+  mounted() {
+    this.hideOverlay();
+    if (this.show) {
+      this.showOverlay();
     }
   },
   methods: {
@@ -371,7 +378,7 @@ export default {
   },
   mounted() {
     const { google, map } = this;
-    set({ google, map, key: BASE_KEY });
+    set({ google, map, show: !!this.show, key: BASE_KEY });
   },
 };
 
@@ -418,7 +425,7 @@ const initOverlay = (o) => {
 };
 
 const setOverlay = (o) => {
-  const { google, map, layer_name, draw } = o || {};
+  const { google, map, layer_name, draw, show = false } = o || {};
   const overlay = new google.maps.OverlayView();
   overlay.setMap(map);
   overlay.onAdd = function onAdd() {
@@ -426,7 +433,7 @@ const setOverlay = (o) => {
       .append('div')
       .attr('class', layer_name)
       .style('position', 'absolute')
-      .style('visibility', 'hidden');
+      .style('visibility', show ? 'visible' : 'hidden');
     this.draw = draw;
   };
   return o;
