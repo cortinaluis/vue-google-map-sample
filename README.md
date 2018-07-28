@@ -109,7 +109,8 @@ Back to `view/map/template.html`,
 we notice that &lt;slot-scope&gt; is in use.
 When receiving the retruned object from `components/google_map_loader`,
 &lt;slot-scope&gt; allows us to destructure the object,
-this time, into 2 separate props, namely, `google` and `map`.  
+this time, into 2 separate props, namely, `google` and `map`.
+
 Like this:
 
 ```
@@ -122,8 +123,9 @@ Like this:
     </template>
 ```
 
-Notice also, as it receives `google` and `map` from the wrapper component,
-it is now *bypassing* these 2 props, this time, to 5 of the following components:
+Notice also, as we get `google` and `map`,
+now it's sort of *bypassing* these 2 props,
+to 5 of the following components:
 
 Component 1: `components/map_marker_without_d3`  
 Component 2: `components/map_marker`  
