@@ -22,11 +22,10 @@ as the one [vue-cli (v3.0)](https://github.com/vuejs/vue-cli) originally creates
 except for `vue.config` (for separate html loading)
 and `.eslintrc.js` (for custom ESLint rules).
 
-Also, instead of having `*.vue`,
-I managed to have a directory per component
-each of which having `index.js`, `template.html`, and `style.styl`.
-It's just a matter of preference,
-and the both fundamentally the same no problem.
+Also, I managed to have a directory per component instead of having a single `*.vue` file,
+each of such directory holds `index.js`, `template.html`, and `style.styl`.
+This is just a matter of preference,
+and they both fundamentally work the same.
 (some related tips are covered in [3-4. Importing Files](#import_files)).
 
 
