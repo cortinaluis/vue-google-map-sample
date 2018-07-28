@@ -17,21 +17,22 @@ Specifically, how to render an overlay layer as SVG using [d3](https://d3js.org/
 2. Setup Google Map using [google-maps-api-loader](https://github.com/laurencedorman/google-maps-api-loader).
 3. Using [d3 (v5)](https://d3js.org/) to render overlay layers as SVG.
 
-So, the project structure is fairly about the same
-compared to the original structure
-[vue-cli (v3.0)](https://github.com/vuejs/vue-cli) initally generates
+As described above, you can tell the project structure is about the same
+as the one [vue-cli (v3.0)](https://github.com/vuejs/vue-cli) originally creates
 except for `vue.config` (for separate html loading)
 and `.eslintrc.js` (for custom ESLint rules).
 
-I also renamed `*.vue` files, and instead created
-an independent directory for each component,
-each of which stores `index.js`, `template.html`, and `style.styl`.
-But, this is no big deal because this is about how it appears
-when managing files, and they fundamentally work the same
-(some related tips are discussed in [3-4. Importing Files](#import_files)).
+Also, instead of having `*.vue`,
+I managed to have a directory per component
+each of which having `index.js`, `template.html`, and `style.styl`.
+It's just a matter of preference,
+and the both fundamentally the same no problem.
+(some related tips are covered in [3-4. Importing Files](#import_files)).
 
 
 ### 2-1. Installed Node Modules
+
+Bellow are the external NPM modules installed:
 
 ```
 npm install --save google-maps-api-loader
@@ -42,15 +43,16 @@ npm install --save-dev json-loader
 npm install --save-dev html-loader
 ```
 
-
 ### 2-2. Google Map, Related Features, and Vue Components
 
 The main discussion here is to how we implement Google Map on Vue projects,
-and how we handle map related features using [d3](https://d3js.org/).
-For the features, I chose "Markers" and "Overlay Layers".
-However, before we go on discussing about this,
-let us first take a look at how we load Google Map.
-This is how the template for `view/map` look like:
+and how we handle map features using [d3](https://d3js.org/).
+As for the map feature samples,
+I chose "Markers" and "Overlay Layers"
+because they are simple, and make good examples.
+
+Before we move on, let's first take a look at how we load a Google map.  
+Here's how `view/map` template looks like:
 
 view/map/template.html:
 
@@ -69,24 +71,27 @@ view/map/template.html:
 </google-map-loader>
 ```
 
-So, we are loading `components/google_map_loader` here.
-Well, `components/google_map_loader` is basically just a wrapper for
+So, we have `components/google_map_loader` component here.
+`components/google_map_loader` is just a wrapper for
 [google-maps-api-loader](https://github.com/laurencedorman/google-maps-api-loader),
-and loading Google Map is the only job it's got.
-When we load `components/google_map_loader` as a Vue component,
-we really don't have to bother much about how we sync the load,
-but Vue will automatically do the job for you.
+and it does nothing other than loading a Google map
+(although I pass `isReady` function as a prop to this component,
+which is totally not necessary, for I'm just using it to find out
+whether the map is loaded in order to resize the map when ready)
 
-For `components/google_map_loader` needs configurations as it loads Google Map,
+When `components/google_map_loader` component is loaded,
+we really don't have to worry about how we sync the load,
+but we basically wait for Vue to do its job for us.
+
+Because we need certain configurations in order to load a Google map,
 we pass `mapElemId`, `apiKey`, and `config`.
-Where `isReady` isn't really necessary, but I thought it would be useful.  
-Currently, I am passing `isReady` for `components/google_map_loader`  
-to call it upon the map instantiation as `view/map` can figure out  
-the map is ready (I have some map resizing job).
 
-Notice also, that we have 2 templates defined above for named-slots, `map-base` and `map-others`.
-These 2 templates are meant to fill the corresponding
-named-slots within in `components/google_map_loader`.  
+Notice, within `components/google_map_loader`,
+we have 2 slot template defined,
+both having names: `map-base` and `map-others`.
+They meant to fill the corresponding named-slots
+that are defined within  `components/google_map_loader`.
+
 And, it looks like this:
 
 components/google_map_loader/template.html:
@@ -100,11 +105,10 @@ components/google_map_loader/template.html:
 </div>
 ```
 
-Let's take a closer look at `view/map/template.html` again.
-When `components/google_map_loader` is ready,
-it will export 2 props: `google` and `map`.
-For `view/map` uses &lt;slot-scope&gt; (with an object destructure)
-can now receives these props.  
+Back to `view/map/template.html`,
+we notice that &lt;slot-scope&gt; is in use.
+This will handle the returned objects,
+and allows us to destructure the object into 2 props, namely, `google` and `map`.  
 Like this:
 
 ```
