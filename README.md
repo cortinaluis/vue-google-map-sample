@@ -48,9 +48,10 @@ The main discussion here is to how we implement Google Map on Vue projects,
 and how we handle map features using [d3](https://d3js.org/).
 As for the map feature samples,
 I chose "Markers" and "Overlay Layers"
-because they are widely used and are simple to implement.
+because they are commonly chosen for Google map examples.
 
-Before we move on, let's first take a look at how we load a Google map.  
+Before we move on, let's first take a look at how we load a Google map.
+
 Here's how `view/map` template looks like:
 
 view/map/template.html:
@@ -106,8 +107,9 @@ components/google_map_loader/template.html:
 
 Back to `view/map/template.html`,
 we notice that &lt;slot-scope&gt; is in use.
-This will handle the returned objects,
-and allows us to destructure the object into 2 props, namely, `google` and `map`.  
+When receiving the retruned object from `components/google_map_loader`,
+&lt;slot-scope&gt; allows us to destructure the object,
+this time, into 2 separate props, namely, `google` and `map`.  
 Like this:
 
 ```
