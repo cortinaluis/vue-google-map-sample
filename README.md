@@ -48,7 +48,7 @@ The main discussion here is to how we implement Google Map on Vue projects,
 and how we handle map features using [d3](https://d3js.org/).
 As for the map feature samples,
 I chose "Markers" and "Overlay Layers"
-because they are simple, and make good examples.
+because they are widely used and are simple to implement.
 
 Before we move on, let's first take a look at how we load a Google map.  
 Here's how `view/map` template looks like:
@@ -80,7 +80,7 @@ whether the map is loaded in order to resize the map when ready)
 
 When `components/google_map_loader` component is loaded,
 we really don't have to worry about how we sync the load,
-but we basically wait for Vue to do its job for us.
+but we basically wait for Vue to do the job for us.
 
 Because we need certain configurations in order to load a Google map,
 we pass `mapElemId`, `apiKey`, and `config`.
