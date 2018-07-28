@@ -133,9 +133,15 @@ Component 3: `components/map_overlay_without_d3`
 Component 3: `components/map_overlay_red_triangle`  
 Component 4: `components/map_overlay_singapore`
 
+I could have limit the number of examples,
+but I thought it would help you understand better
+if I gave you comparisons
+between the one *NOT* using d3 and the one using d3.
+
+
 #### Component 1: "components/map_marker_without_d3"
 
-This is a demonstration just to show you that you can plot markers without using d3.
+This is a demonstration just to show you that you can plot markers without d3.
 
 components/map_markers_without_d3/index.js:
 
@@ -184,6 +190,7 @@ export default {
 
 #### Component 2: "components/map_markers"
 
+This is an example using d3 (to implement markers on the map).
 When `google` and `map` is given, it adds a new Google Overlay layer to the map,
 and projects a SVG rendered overlay.
 
